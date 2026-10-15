@@ -1,0 +1,24 @@
+name: Gameplay checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check core.js
+          node --check world.js
+          node --check game.js
+          node --check coop.js
+      - name: Test gameplay rules and economy
+        run: npm test
