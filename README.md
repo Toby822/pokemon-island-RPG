@@ -15,7 +15,7 @@ No account, purchase, build step or API key is required. Use a current desktop b
 - **Three activities:** open-world exploration, guardian encounters and escalating Rift survival waves.
 - **An earned-ticket summon system:** visible tier odds, a 50-roll Legendary guarantee and no paid currency.
 - **An economy with consequences:** carried coins, protected bank deposits, 50% carried-coin loss on defeat, resource gathering, potions and shared equipment refinement.
-- **Friends-only co-op:** up to four browsers share the host's world over WebRTC. Everyone retains their own collection and local save.
+- **Shared pixel worlds and co-op:** up to eight browsers share the host's world over WebRTC. Everyone retains their own collection and local save.
 - **Save export/import:** validated JSON backups for moving between devices.
 - Reduced-motion controls, keyboard-accessible menus, responsive layouts and optional synthesised sound effects.
 
@@ -77,6 +77,10 @@ IV reforging costs 12 stardust and can make stats worse. Releasing a companion g
 
 ## Co-op
 
+**Worlds → Enter world** joins HAVEN-1, HAVEN-2 or HAVEN-3 without a code. The first explorer becomes host; later explorers join that host. Each shared world supports up to eight players. These are browser-hosted sessions and close when the host leaves. They are not dedicated always-on servers.
+
+For a private room (up to four players):
+
 1. Both players open the game and finish starter selection.
 2. The host opens **Co-op → Create a room**.
 3. Friends enter the six-character code and select **Join a friend**.
@@ -84,7 +88,7 @@ IV reforging costs 12 stardust and can make stats worse. Releasing a companion g
 
 The host simulates enemy AI, elemental damage, kills and waves and broadcasts snapshots at 10 Hz. Movement is locally responsive. Kill rewards are broadcast to connected guests. Enemy HP scales with party size when spawned.
 
-This is an **experimental friends-only co-op implementation**, not an MMO. It depends on the public PeerJS signalling service, STUN and browser WebRTC. Some NAT/firewall combinations require a TURN relay that this release does not provide. The host must remain open; host migration, accounts, server-held saves, anti-cheat, trading and cross-session lobbies are not implemented. Do not use local saves or co-op messages as trusted records for competitive play.
+This is an **experimental browser-hosted co-op implementation**, not an MMO. It depends on the public PeerJS signalling service, STUN and browser WebRTC. Some NAT/firewall combinations require a TURN relay that this release does not provide. The host must remain open; host migration, accounts, server-held saves, anti-cheat, trading and cross-session lobbies are not implemented. Do not use local saves or co-op messages as trusted records for competitive play.
 
 ## Run locally
 
@@ -104,12 +108,13 @@ The automated tests cover the full species pool, type immunity, banking/death ac
 | --- | --- |
 | core.js | Combat formulas, economy, summons, quests, progression and save validation |
 | data.js | Local snapshot of default-species data and type effectiveness |
+| sprites.js / pmd-meta.js | Directional sprite sheets, frame timings and starter animation metadata |
 | world.js | Fixed-step simulation, Canvas rendering, terrain, entities and combat effects |
 | coop.js | Room lifecycle and WebRTC data protocol |
 | game.js | Menus, input, save lifecycle and HUD |
 | style.css | Responsive visual design and UI motion |
 
-The terrain and scenery are drawn in Canvas, with seeded placement, depth sorting, shadows, weather, particles and day/night tint. Pokémon use externally loaded sprite images with procedural movement, attack and hit animation. These are not full directional sprite-sheet animations. Later-generation sprites may be unavailable upstream; the world falls back to a type-coloured creature marker.
+The terrain and scenery are drawn in Canvas, with seeded placement, depth sorting, shadows, weather, particles and day/night tint. Pokémon now use actual PMDCollab eight-direction sprite sheets with timed Walk, Idle, Attack, Shoot and Hurt states. Twenty starter sheets are bundled locally. Other species request their XML metadata and sprite sheets on demand; coverage depends on the source repository. Missing animations fall back to available states or PokéAPI artwork. Shiny PMD sprites use a hue tint, not canonical shiny palettes. The Canvas deliberately renders at half resolution and scales with nearest-neighbour sampling for a pixel-art look.
 
 Species data is bundled, so gameplay does not query the live PokéAPI on every roll. Sprites, fonts and co-op signalling are external services. Base stats and type matchups are canonical; final HP, Mana, traits, power scaling, skills, enemy AI and progression are this game's original action-RPG rules. Canonical movesets, abilities, alternate forms, status ailments and every Pokémon Survivors feature are not reproduced.
 

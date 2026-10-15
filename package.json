@@ -1,8 +1,8 @@
 {
   "name": "pokemon-tides-of-aether",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node tests.mjs", "start": "node serve.mjs" },
+  "scripts": { "test": "node tests.mjs && node animation-tests.mjs && node coop-tests.mjs", "start": "node serve.mjs" },
   "description": "An unofficial non-commercial Pokémon island action RPG"
 }

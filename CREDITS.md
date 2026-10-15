@@ -12,7 +12,7 @@
 
 PeerJS 1.5.4 is vendored as assets/peerjs.min.js from its published npm distribution. [PeerJS project](https://github.com/peers/peerjs) · [Documentation](https://peerjs.com/docs/).
 
-The upstream licence notice is retained in the distribution. Public PeerJS Cloud is used for signalling; gameplay uses WebRTC data connections. A production deployment can replace signalling/STUN configuration and provide its own TURN relay.
+The upstream MIT licence is retained in assets/PEERJS-LICENSE.txt. Public PeerJS Cloud is used for signalling; gameplay uses WebRTC data connections. A production deployment can replace signalling/STUN configuration and provide its own TURN relay.
 
 ## Interface
 
@@ -31,3 +31,12 @@ No gameplay code or art was copied from Hypixel or Pokémon Survivors. This game
 ## Project status
 
 An unofficial non-commercial fan project. The source is visible for inspection; this repository does not grant rights to third-party Pokémon intellectual property. No blanket MIT licence is applied to Pokémon assets or data.
+
+## Pixel character animations (v1.1)
+
+- [PMDCollab SpriteCollab](https://github.com/PMDCollab/SpriteCollab), with individual artist records in each species' sprite/NNNN/credits.txt.
+- [Bundled starter attribution](assets/PMD-CREDITS.txt). The included Bulbasaur, Charmander, Squirtle and Pikachu sheets are credited by the repository to CHUNSOFT and any authors listed in that file.
+- Community-created contributions follow [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/); official Pokémon Mystery Dungeon artwork remains the property of its rights holders.
+- Other species are loaded from SpriteCollab on demand. Their original per-species credit files remain accessible in the source repository.
+- Sheets are displayed with nearest-neighbour scaling; a hue shift distinguishes shiny companions. No claim is made that the hue shift reproduces canonical shiny colours.
+- [PMD sprite format](https://wiki.pmdo.pmdcollab.org/PMD_Sprite_Format) documents frame ordering and 1/60-second duration units.
