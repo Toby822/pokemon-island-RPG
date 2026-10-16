@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import {World} from './world.js?v=1.4.0';
-import {newGame,ISLANDS,BY_ID,enemyRole} from './core.js?v=1.4.0';
-import {groundAt,walkableGround,TOWN_BUILDINGS,regionalBuildings} from './pixel-art.js?v=1.4.0';
+import {World} from './world.js?v=1.4.1';
+import {newGame,ISLANDS,BY_ID,enemyRole} from './core.js?v=1.4.1';
+import {groundAt,walkableGround,TOWN_BUILDINGS,regionalBuildings} from './pixel-art.js?v=1.4.1';
 const hooks={toast(){},sound(){},panel(){},changed(){},hud(){}};
 const make=()=>new World(null,newGame(),hooks,{headless:true});
 const w=make();w.p.x=900;w.p.y=790;w.p.hp=100;w.keys={d:true};w.update(.1);assert(w.p.x>900);assert.equal(w.p.dir,2);

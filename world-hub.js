@@ -1,6 +1,6 @@
-import {WORLD_SIZE} from './pixel-art.js?v=1.4.0';
-import {stats} from './core.js?v=1.4.0';
-import {combatReward} from './progression.js?v=1.4.0';
+import {WORLD_SIZE} from './pixel-art.js?v=1.4.1';
+import {stats} from './core.js?v=1.4.1';
+import {combatReward} from './progression.js?v=1.4.1';
 export class WorldHub{
  constructor(coop){this.coop=coop;this.scenes=new Map();this.clients=new Map();this.elapsed=0;}
  scene(id){

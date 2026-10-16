@@ -1,4 +1,4 @@
-import {BIOMES,paintTile,paintBuilding,paintTree,paintRock,paintProp} from './pixel-art.js?v=1.4.0';
+import {BIOMES,paintTile,paintBuilding,paintTree,paintRock,paintProp} from './pixel-art.js?v=1.4.1';
 export function paintScene(c,id=0,service=null){
  const b=BIOMES[id],r=(col,x,y,w,h)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
  r(b.water[0],0,0,240,136);

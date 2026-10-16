@@ -1,4 +1,4 @@
-import {t,translateText} from './i18n.js?v=1.4.0';
+import {t,translateText} from './i18n.js?v=1.4.1';
 export const NPCS=[
  {id:'banker',pokemon:52,name:'Milo',title:'Haven banker',titleZh:'主城銀行員',x:700,y:710,island:0,service:'bank',lines:['A shiny coin is lovely. Keeping it after a rough expedition is even lovelier.','Deposit what you can spare. The bank protects every coin, even if you faint.'],zh:['亮晶晶的金幣真可愛。不過，冒險回來還能保住它們，感覺更好。','出發前存入暫時用不到的金幣吧。即使倒下，銀行裡的錢也不會少。']},
  {id:'smith',pokemon:68,name:'Brann',title:'Master smith',titleZh:'鍛造大師',x:1100,y:715,island:0,service:'forge',lines:['Four arms, one forge, and somehow there is still a queue.','Bring ore from the wilds. Refinement is guaranteed here; choose the piece you actually want to keep.'],zh:['四隻手、一座熔爐，結果工作還是做不完。','帶礦石來吧。這裡的強化必定成功；先挑一件真正想長期使用的裝備。']},

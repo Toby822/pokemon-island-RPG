@@ -1,12 +1,12 @@
-import {drawEnemyHUD,drawHazards,drawCinematic} from './combat-view.js?v=1.4.0';
-import {NPCS} from './dialogue.js?v=1.4.0';
-import {translateText,t} from './i18n.js?v=1.4.0';
-import {BOSS_PROFILES,makeHazards,hazardContains,encounterPower} from './bosses.js?v=1.4.0';
-import {BY_ID,ISLANDS,COLORS,stats,damage,typeMultiplier,clamp,choose,awardXP,die,pretty,enemyRole} from './core.js?v=1.4.0';
-import {itemBonuses,createItem,GEAR_TYPES,ITEM_TIERS,itemName} from './items.js?v=1.4.0';
-import {LANDMARKS,discover,openTreasure,combatReward} from './progression.js?v=1.4.0';
-import {SpriteBank,facing} from './sprites.js?v=1.4.0';
-import {BIOMES,TOWN_BUILDINGS,regionalBuildings,onIsland,walkableGround,roadAt,paintTerrain,paintObject,paintProp,WORLD_SIZE} from './pixel-art.js?v=1.4.0';
+import {drawEnemyHUD,drawHazards,drawCinematic} from './combat-view.js?v=1.4.1';
+import {NPCS} from './dialogue.js?v=1.4.1';
+import {translateText,t} from './i18n.js?v=1.4.1';
+import {BOSS_PROFILES,makeHazards,hazardContains,encounterPower} from './bosses.js?v=1.4.1';
+import {BY_ID,ISLANDS,COLORS,stats,damage,typeMultiplier,clamp,choose,awardXP,die,pretty,enemyRole} from './core.js?v=1.4.1';
+import {itemBonuses,createItem,GEAR_TYPES,ITEM_TIERS,itemName} from './items.js?v=1.4.1';
+import {LANDMARKS,discover,openTreasure,combatReward} from './progression.js?v=1.4.1';
+import {SpriteBank,facing} from './sprites.js?v=1.4.1';
+import {BIOMES,TOWN_BUILDINGS,regionalBuildings,onIsland,walkableGround,roadAt,paintTerrain,paintObject,paintProp,WORLD_SIZE} from './pixel-art.js?v=1.4.1';
 export const SIZE=WORLD_SIZE;
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function seeded(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
@@ -64,7 +64,7 @@ export class World{
  this.enemies.push({role,healTimer:5,introUntil:boss?this.time+3:0,skillIndex:0,apex:!!override?.apex,uid:++this.enemyId|| (this.enemyId=1),id,x,y,homeX:x,homeY:y,hp,max:hp,level,boss,hit:0,cd:1+Math.random(),phase:0,tell:0,atk:power.attack,def:8+p.s[2]*.15+level,sd:8+p.s[4]*.15+level,speed:boss?66:(48+p.s[5]*.3)*(role==='skirmisher'?1.25:1),wand:Math.random()*6.28});this.image(id);if(boss){const message={type:'bossIntro',id,island:this.id,apex:!!override?.apex};if(this.headless)this.net?.broadcast(message);else this.beginIntro(id);}
  }
  startBoss(){if(this.net&&['host','guest'].includes(this.net.role)){this.net.action('boss');return;}if(!this.id)return;if(this.mode==='rift')return this.h.toast('Finish the Rift or leave the island first.');if(this.enemies.some(e=>e.boss))return this.h.toast('The guardian is already awake.');this.spawn(true);this.h.toast('The guardian awakens. Watch for red attack circles!','bad');}
- startRift(){if(this.net&&['host','guest'].includes(this.net.role)){this.net.action('rift');return;}if(!this.id)return;this.enemies=[];this.bullets=[];this.mode='rift';this.wave=0;this.waveWait=2;this.riftTime=0;this.apexSummoned=false;this.h.toast('Rift opened. Clear waves for tickets. Leave via the atlas.','good');}
+ startRift(){if(this.net&&['host','guest'].includes(this.net.role)){this.net.action('rift');return;}if(!this.id)return;if(this.mode==='rift')return this.h.toast(t('A Rift run is already active.','裂隙挑戰已在進行中。'));if(this.enemies.some(e=>e.boss&&e.hp>0))return this.h.toast(t('Defeat the guardian or leave this region before opening a Rift.','請先擊敗守護者，或離開此區，再開啟裂隙。'));this.enemies=[];this.bullets=[];this.hazards=[];this.corpses=[];this.cinematic=null;this.rings=[];this.lootBursts=[];this.mode='rift';this.wave=0;this.waveWait=2;this.riftTime=0;this.apexSummoned=false;this.h.toast('Rift opened. Clear waves for tickets. Leave via the atlas.','good');}
  target(p=this.p,range=900){return this.enemies.filter(e=>e.hp>0&&dist(e,p)<range).sort((a,b)=>dist(a,p)-dist(b,p))[0];}
  attack(actor=this.p,remote=null){
  if(this.paused||actor.dying||this.cinematic?.left>0||actor.cool>0||!this.id)return;
@@ -131,7 +131,7 @@ export class World{
  if(e.role==='healer'){e.healTimer-=dt;if(e.healTimer<=0){e.healTimer=7;for(const ally of this.enemies)if(ally.hp>0&&ally.hp<ally.max&&dist(e,ally)<240){ally.hp=Math.min(ally.max,ally.hp+Math.ceil(ally.max*.1));this.fx(ally.x,ally.y,'#b1df91',6);}e.action='Shoot';e.actionStart=this.time;e.actionUntil=this.time+.5;}}
  const candidates=[...(this.headless?[]:[p]),...Object.values(this.remotes).filter(r=>r.island===this.id&&r.hp>0)];if(!candidates.length)continue;const t=candidates.sort((a,b)=>dist(a,e)-dist(b,e))[0],d=dist(e,t);
  if(e.tell>0){e.tell-=dt;if(e.tell<=0){this.rings.push({x:e.tx,y:e.ty,r:e.radius,life:.5,max:.5,color:'#f3a48a'});if(Math.hypot(p.x-e.tx,p.y-e.ty)<e.radius)this.hurt(Math.max(8,Math.round(e.atk*2.1*100/(100+st.def))));for(const r of Object.values(this.remotes))if(Math.hypot(r.x-e.tx,r.y-e.ty)<e.radius)this.net?.sendTo(r.id,{type:'hurt',amount:Math.round(e.atk*2.1*100/(100+r.st.def))});this.fx(e.tx,e.ty,'#e7a17e',30);}continue;}
- if(e.boss&&e.hp<e.max*.5&&!e.phase){e.phase=1;if(this.headless)this.net?.broadcast({type:'bossPhase',id:e.id,island:this.id});else this.beginIntro(e.id,true);}
+ if(e.boss&&e.hp<e.max*.5&&!e.phase){e.phase=1;e.introUntil=this.time+1.6;e.cd=Math.max(e.cd,2.1);this.hazards=this.hazards.filter(h=>h.source!==e.uid);if(this.headless)this.net?.broadcast({type:'bossPhase',id:e.id,island:this.id});else this.beginIntro(e.id,true);continue;}
  if(e.boss&&e.cd<=0&&d<850){const profile=BOSS_PROFILES[e.id]||BOSS_PROFILES[this.map.boss],skill=profile.skills[e.skillIndex++%profile.skills.length];this.hazards.push(...makeHazards(e,t,skill,e.phase));e.cd=e.phase?2.9:4;e.action='Shoot';e.actionStart=this.time;e.actionUntil=this.time+.65;continue;}
 
  let a;

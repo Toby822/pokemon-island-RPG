@@ -1,6 +1,6 @@
-import {TALENTS} from './talents.js?v=1.4.0';
-import {POKEMON_NAMES_ZH} from './names-zh.js?v=1.4.0';
-import {ZH_EXTRA} from './zh-catalog.js?v=1.4.0';
+import {TALENTS} from './talents.js?v=1.4.1';
+import {POKEMON_NAMES_ZH} from './names-zh.js?v=1.4.1';
+import {ZH_EXTRA} from './zh-catalog.js?v=1.4.1';
 export let language='en';
 export const ZH={
  'Tides of Aether':'以太紀行','Explore':'探索','Sanctuary':'寶可夢收藏','Equipment':'裝備背包','Equipment & Accessories':'裝備與飾品','Summon':'召喚','Island atlas':'世界地圖','Island Atlas':'世界地圖','Journal':'冒險日誌','Worlds':'多人世界','Field guide':'遊戲指南','Field Guide':'遊戲指南','Return to Haven':'返回主城','Your companions':'同行夥伴','View all ↗':'查看全部 ↗','Haven town directory':'主城設施導覽','Rangers Guild':'探險公會','Abilities':'能力培育','Talents':'天賦樹','Talent Tree':'天賦樹','Haven Bank':'主城銀行','Artisan’s Forge':'工匠鍛造坊',"Artisan's forge":'工匠鍛造坊','Boss Armory':'守護者武庫','Weapon Codex':'武器圖鑑','Backpack':'冒險背包','Inventory':'道具清單','NPC Dialogue':'寶可夢對話','Relic Emporium':'遺物抽獎屋','Provisioner Market':'補給市場','Island Bestiary':'地區生態圖鑑','Haven Town Directory':'主城導覽','Summon Shrine':'寶可夢召喚神殿','Expedition Supplies':'野外補給站','Rift Survival':'裂隙生存挑戰','Shared Worlds':'共享多人世界','Keep your story safe.':'設定與存檔','Aether Haven':'以太主城','Verdant Wilds':'翠綠樹海','Coral Coast':'珊瑚港灣','Cinder Crater':'熾焰城塞','Cinder Citadel':'熾焰城塞','Frostveil Reach':'霜幕要塞','Frostveil Keep':'霜幕要塞','Stormglass Peaks':'雷晶工業城','Stormglass Foundry':'雷晶工業城','Moonshade Hollow':'月影古城','Moonshade City':'月影古城','Astral Sanctuary':'星界王宮','Astral Palace':'星界王宮',
@@ -24,13 +24,76 @@ export function translateText(value){if(language==='en'||typeof value!=='string'
  for(const en of exact)if(out.includes(en)){const escaped=en.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');out=out.replace(new RegExp('(?<![A-Za-z])'+escaped+'(?![A-Za-z])','g'),ZH[en]);}if(translationCache.size>5000)translationCache.clear();translationCache.set(value,out);return out;
 }
 export const t=(en,zh)=>language==='zh-Hant'?zh:en;
-let applyDOM=null;
+// The game writes live HUD text synchronously in the selected language. Keeping
+// its English source on the text node lets later language switches restore it.
+const textSources=new WeakMap();
+export function setLocalizedText(el,value){
+ if(!el)return;const source=String(value??''),rendered=translateText(source);
+ if(el.textContent!==rendered)el.textContent=rendered;
+ const node=el.firstChild;if(node?.nodeType===3)textSources.set(node,{source,rendered});
+}
+export function isAtlasShortcut(e){
+ if(String(e.key).toLowerCase()!=='m'||e.repeat||e.isComposing||e.ctrlKey||e.metaKey||e.altKey)return false;
+ // A language/menu select can retain focus after a click. M still opens the
+ // atlas there; editable search fields must retain ordinary text entry.
+ const el=e.target;return !el?.isContentEditable&&!el?.closest?.('input,textarea,[contenteditable="true"],[contenteditable=""],[role="textbox"]');
+}
+let applyDOM=null,i18nInstallation=null;
 export function setLanguage(next,persist=true){language=next==='zh-Hant'?'zh-Hant':'en';if(typeof document!=='undefined'){document.documentElement.lang=language;document.documentElement.dataset.language=language;}if(persist)try{localStorage.setItem('aether-language',language);}catch(e){}applyDOM?.();}
-export function installI18n(){if(typeof document==='undefined'||!document.createTreeWalker)return;const originals=new WeakMap(),attrs=new WeakMap();let observer,queued=false;
- function apply(root=document.body){observer?.disconnect();const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode())){if(node.parentElement?.closest('script,style,[data-i18n-skip]'))continue;let rec=originals.get(node);if(!rec||node.nodeValue!==rec.rendered)rec={source:node.nodeValue};rec.rendered=translateText(rec.source);originals.set(node,rec);if(node.nodeValue!==rec.rendered)node.nodeValue=rec.rendered;}
- for(const el of root.querySelectorAll('[title],[placeholder],[aria-label]')){const saved=attrs.get(el)||{};for(const key of ['title','placeholder','aria-label']){const value=el.getAttribute(key);if(value===null)continue;const rec=saved[key];const source=rec&&value===rec.rendered?rec.source:value,rendered=translateText(source);saved[key]={source,rendered};if(value!==rendered)el.setAttribute(key,rendered);}attrs.set(el,saved);}observer?.observe(document.body,{subtree:true,childList:true,characterData:true});const select=document.getElementById('language-select');if(select)select.value=language;
+export function installI18n(){
+ if(typeof document==='undefined'||!document.createTreeWalker)return;
+ if(i18nInstallation)return i18nInstallation;
+ const attrs=new WeakMap(),pending=new Set();let observer,queued=false,disposed=false;
+ const options={subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['title','placeholder','aria-label']};
+ const skipped=node=>(node.nodeType===3?node.parentElement:node)?.closest?.('script,style,[data-i18n-skip]');
+ function translateNode(node){
+  if(skipped(node))return;let rec=textSources.get(node);
+  if(!rec||node.nodeValue!==rec.rendered)rec={source:node.nodeValue};
+  rec.rendered=translateText(rec.source);textSources.set(node,rec);
+  if(node.nodeValue!==rec.rendered)node.nodeValue=rec.rendered;
  }
- applyDOM=()=>apply();let saved;try{saved=localStorage.getItem('aether-language');}catch(e){}setLanguage(saved||'zh-Hant',false);
- if(typeof MutationObserver!=='undefined'){observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;apply();});});observer.observe(document.body,{subtree:true,childList:true,characterData:true});}
- document.addEventListener('change',e=>{if(e.target.id==='language-select'){setLanguage(e.target.value);document.dispatchEvent(new CustomEvent('aether-language'));}});
+ function translateElement(el){
+  if(skipped(el))return;
+  // Translating an option without an explicit value otherwise changes the
+  // value submitted by the type filter ("water" would become "水").
+  if(el.tagName==='OPTION'&&!el.hasAttribute('value'))el.setAttribute('value',el.value);
+  const saved=attrs.get(el)||{};
+  for(const key of ['title','placeholder','aria-label']){
+   const value=el.getAttribute(key);if(value===null)continue;
+   const rec=saved[key],source=rec&&value===rec.rendered?rec.source:value,rendered=translateText(source);
+   saved[key]={source,rendered};if(value!==rendered)el.setAttribute(key,rendered);
+  }
+  attrs.set(el,saved);
+ }
+ function apply(root=document.body){
+  if(disposed||!root||root.isConnected===false||skipped(root))return;
+  if(root.nodeType===3){translateNode(root);return;}
+  translateElement(root);
+  // Freeze option values before replacing their visible text.
+  for(const el of root.querySelectorAll('option,[title],[placeholder],[aria-label]'))translateElement(el);
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;
+  while((node=walker.nextNode()))translateNode(node);
+ }
+ function flush(){
+  queued=false;if(disposed)return;observer?.disconnect();
+  for(const root of pending)if(![...pending].some(other=>other!==root&&other.contains?.(root)))apply(root);
+  pending.clear();observer?.observe(document.body,options);
+ }
+ function schedule(records){
+  for(const record of records){
+   if(record.type==='childList')for(const node of record.addedNodes)pending.add(node);
+   else pending.add(record.target);
+  }
+  if(queued||!pending.size)return;queued=true;
+  // Mutation callbacks and this microtask both finish before paint. A second
+  // requestAnimationFrame used to expose English for a frame on every HUD tick.
+  if(typeof queueMicrotask==='function')queueMicrotask(flush);else Promise.resolve().then(flush);
+ }
+ applyDOM=()=>{observer?.disconnect();pending.clear();apply();observer?.observe(document.body,options);const select=document.getElementById('language-select');if(select&&select.value!==language)select.value=language;};
+ let saved;try{saved=localStorage.getItem('aether-language');}catch(e){}setLanguage(saved||'zh-Hant',false);
+ if(typeof MutationObserver!=='undefined'){observer=new MutationObserver(schedule);observer.observe(document.body,options);}
+ const onChange=e=>{if(e.target.id==='language-select'){setLanguage(e.target.value);document.dispatchEvent(new CustomEvent('aether-language'));}};
+ document.addEventListener('change',onChange);
+ i18nInstallation={apply:applyDOM,dispose(){disposed=true;observer?.disconnect();pending.clear();document.removeEventListener('change',onChange);applyDOM=null;i18nInstallation=null;}};
+ return i18nInstallation;
 }

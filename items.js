@@ -1,5 +1,5 @@
-import {talentBonuses,migrateAdventure} from './talents.js?v=1.4.0';
-import {RELIC_WEAPONS} from './relic-weapons.js?v=1.4.0';
+import {talentBonuses,migrateAdventure} from './talents.js?v=1.4.1';
+import {RELIC_WEAPONS} from './relic-weapons.js?v=1.4.1';
 export const ITEM_TIERS=[
  {name:'Common',color:'#a5aab3',chance:60,power:1},
  {name:'Rare',color:'#65a7ff',chance:25,power:1.35},

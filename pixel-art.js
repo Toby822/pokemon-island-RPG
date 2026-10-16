@@ -1,4 +1,4 @@
-import {paintArchitecture} from './architecture.js?v=1.4.0';
+import {paintArchitecture} from './architecture.js?v=1.4.1';
 export const WORLD_SIZE={w:3600,h:2600};
 // Original pixel artwork. Coordinates in the painters are native pixels (2 world units).
 export const BIOMES=[

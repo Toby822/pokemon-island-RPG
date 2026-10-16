@@ -1,6 +1,6 @@
-import {validateAdventure} from './talents.js?v=1.4.0';
-import {migrateItems,validateItems} from './items.js?v=1.4.0';
-import { DEX, TYPES, EVOLUTION } from './data.js?v=1.4.0';
+import {validateAdventure} from './talents.js?v=1.4.1';
+import {migrateItems,validateItems} from './items.js?v=1.4.1';
+import { DEX, TYPES, EVOLUTION } from './data.js?v=1.4.1';
 export { DEX };
 export const VERSION=1;
 export const BY_ID=new Map(DEX.map(p=>[p.id,p]));

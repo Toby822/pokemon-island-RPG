@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {newGame,stats,createMon,validateSave,ISLANDS,BY_ID,damage} from './core.js?v=1.4.0';
-import {TALENTS,learnTalent,talentSpent,talentBudget,resetTalents} from './talents.js?v=1.4.0';
-import {itemBonuses,rollEquipment,ITEM_BY_ID,GEAR_TYPES} from './items.js?v=1.4.0';
-import {rollBossWeapon,BOSS_ODDS} from './boss-armory.js?v=1.4.0';
-import {BOSS_PROFILES,makeHazards,hazardContains,encounterPower} from './bosses.js?v=1.4.0';
-import {World} from './world.js?v=1.4.0';
-import {setLanguage,translateText} from './i18n.js?v=1.4.0';
+import {newGame,stats,createMon,validateSave,ISLANDS,BY_ID,damage} from './core.js?v=1.4.1';
+import {TALENTS,learnTalent,talentSpent,talentBudget,resetTalents} from './talents.js?v=1.4.1';
+import {itemBonuses,rollEquipment,ITEM_BY_ID,GEAR_TYPES} from './items.js?v=1.4.1';
+import {rollBossWeapon,BOSS_ODDS} from './boss-armory.js?v=1.4.1';
+import {BOSS_PROFILES,makeHazards,hazardContains,encounterPower} from './bosses.js?v=1.4.1';
+import {World} from './world.js?v=1.4.1';
+import {setLanguage,translateText} from './i18n.js?v=1.4.1';
 const test=(n,fn)=>{fn();console.log('PASS '+n);};
 test('Talent budget, prerequisites, rank cap, passive stats and paid refund',()=>{const s=newGame();assert.throws(()=>learnTalent(s,'stride'));s.trainer=17;assert.equal(talentBudget(s),8);learnTalent(s,'stride');assert.throws(()=>learnTalent(s,'focus'));learnTalent(s,'stride');learnTalent(s,'focus');learnTalent(s,'focus');learnTalent(s,'luck');assert.equal(talentSpent(s),5);assert(itemBonuses(s).speed>0&&itemBonuses(s).cdr>0&&itemBonuses(s).loot>0);learnTalent(s,'stride');assert.throws(()=>learnTalent(s,'stride'));s.coins=300;resetTalents(s);assert.equal(s.coins,50);assert.equal(talentSpent(s),0);});
 test('Old saves migrate and invalid talent paths / seal counters are rejected',()=>{const s=newGame();delete s.talents;delete s.bossVouchers;delete s.bossPity;delete s.bossUltraPity;delete s.npcGifts;const saved=validateSave(s);assert.deepEqual(saved.bossVouchers,Array(8).fill(0));saved.talents={sage:1};assert.throws(()=>validateSave(saved));saved.talents={};saved.bossVouchers[1]=-1;assert.throws(()=>validateSave(saved));});

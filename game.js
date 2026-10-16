@@ -1,17 +1,20 @@
-import {installChronicles} from './chronicle-ui.js?v=1.4.0';
-import {installDialogue} from './dialogue.js?v=1.4.0';
-import {installI18n,t,translateText} from './i18n.js?v=1.4.0';
-import {pixelIcon,sceneArt,serviceHero} from './ui-art.js?v=1.4.0';
-import {installExpansion} from './expansion-ui.js?v=1.4.0';
-import {itemBonuses} from './items.js?v=1.4.0';
-import {DEX,BY_ID,ISLANDS,COLORS,RARITIES,RARITY_COLORS,TRAITS,SKILLS,QUESTS,pretty,stats,newGame,roll,xpNeeded,deposit,withdraw,spendPoint,questProgress,claimQuest,daily,validateSave,evolutionFor,evolve,rarityOf,clamp,enemyRole} from './core.js?v=1.4.0';
-import {World} from './world.js?v=1.4.0';
-import {Coop} from './coop.js?v=1.4.0';
+import {installChronicles} from './chronicle-ui.js?v=1.4.1';
+import {installDialogue} from './dialogue.js?v=1.4.1';
+import {installI18n,t,translateText,setLocalizedText,isAtlasShortcut} from './i18n.js?v=1.4.1';
+import {pixelIcon,sceneArt,serviceHero} from './ui-art.js?v=1.4.1';
+import {installExpansion} from './expansion-ui.js?v=1.4.1';
+import {itemBonuses} from './items.js?v=1.4.1';
+import {DEX,BY_ID,ISLANDS,COLORS,RARITIES,RARITY_COLORS,TRAITS,SKILLS,QUESTS,pretty,stats,newGame,roll,xpNeeded,deposit,withdraw,spendPoint,questProgress,claimQuest,daily,validateSave,evolutionFor,evolve,rarityOf,clamp,enemyRole} from './core.js?v=1.4.1';
+import {World} from './world.js?v=1.4.1';
+import {Coop} from './coop.js?v=1.4.1';
 const $=id=>document.getElementById(id), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sprite=(id,shiny=false)=>'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/'+(shiny?'shiny/':'')+id+'.png';
 const img=(id,shiny=false,attrs='')=>'<img src="'+sprite(id,shiny)+'" alt="'+esc(pretty(BY_ID.get(id).n))+'" '+attrs+'>';
 const typeTags=p=>'<div class="types">'+p.t.map(t=>'<span class="type" style="--type:'+COLORS[t]+'">'+t+'</span>').join('')+'</div>';
 let textSize='readable';try{textSize=localStorage.getItem('aether-text-size')==='larger'?'larger':'readable';}catch(e){}document.documentElement.dataset.textSize=textSize;
+const stableHTML=new WeakMap();
+function setStableHTML(el,value){if(stableHTML.get(el)!==value){el.innerHTML=value;stableHTML.set(el,value);}}
+const text=(id,value)=>setLocalizedText($(id),value);
 let state,hasSave=false,saveError='',panel='',page=0,filter='',dexMode=false,typeFilter='',selected=25,lastRoll=null,audio=null,soundOn=false,lastHUD=0,collectionTimer;
 try{const raw=localStorage.getItem('aether-save-v1');if(raw){state=validateSave(JSON.parse(raw));hasSave=true;}}catch(e){saveError='A previous save could not load. Export it in settings before overwriting.';}
 state??=newGame();
@@ -24,32 +27,32 @@ const coop=new Coop(world,()=>{world.paused=!!panel&&coop.role==='solo';updateUI
 const expansion=installExpansion({state:()=>state,world,coop,modal,changed,toast,esc});
 const chronicles=installChronicles({state:()=>state,world,coop,modal,changed,toast,esc});
 const dialogue=installDialogue({state:()=>state,world,modal,changed,toast,esc,close:closePanel});
-function save(){if(!hasSave||saveError)return;try{localStorage.setItem('aether-save-v1',JSON.stringify(state));$('save-status').textContent='Adventure saved on this device';}catch(e){$('save-status').textContent='Storage unavailable · export a save in settings';}}
+function save(){if(!hasSave||saveError)return;try{localStorage.setItem('aether-save-v1',JSON.stringify(state));text('save-status','Adventure saved on this device');}catch(e){text('save-status','Storage unavailable · export a save in settings');}}
 function changed(){updateUI();save();}
 function updateUI(){
  const m=world.mon(),p=BY_ID.get(m.id);
- $('coins').textContent=Math.floor(state.coins).toLocaleString();$('tickets').textContent=state.tickets.toLocaleString();$('trainer-level').textContent=String(state.trainer).padStart(2,'0');$('rank-label').textContent=state.trainer<5?'A new beginning':state.trainer<14?'Finding your own path':state.trainer<24?'Between sea and stars':'Keeper of the sky';
- $('xp-text').textContent=Math.floor(state.xp)+' / '+xpNeeded(state.trainer);$('xp-bar').style.width=clamp(state.xp/xpNeeded(state.trainer)*100,0,100)+'%';$('kill-count').textContent=state.kills;$('dex-count').textContent=new Set(state.party.map(m=>m.id)).size;$('sigil-count').textContent=state.sigils.length+'/7';
- $('avatar').src=sprite(m.id,m.shiny);$('mon-name').textContent=pretty(p.n)+(m.shiny?' ✧':'');$('level-label').textContent='Lv. '+m.lv;$('q-name').textContent=pretty(p.t[0])+' bolt';$('potion-count').textContent=state.potions+' potions';$('point-count').textContent=m.points?m.points+' skill points to spend':'Build your own playstyle';$('bank-summary').textContent=state.bank.toLocaleString()+' coins protected';$('net-dot').textContent=coop.role==='solo'?'solo':coop.role==='host'?(coop.connections.size+1)+'/'+coop.maxPlayers:coop.host?.open?'joined':'linking';
- $('chapter-name').textContent=ISLANDS[world.id].name;$('chapter-sub').textContent=ISLANDS[world.id].sub;
- $('weather-label').textContent=({petals:'❀ Petal breeze',rain:'☂ Passing rain',embers:'♨ Drifting embers',snow:'❄ Gentle snowfall',wisps:'✧ Moonlit wisps',stars:'✦ Starlight'})[world.map.weather];
- $('roster').innerHTML=state.party.slice(0,3).map((m,i)=>'<button class="companion" data-equip="'+i+'">'+img(m.id,m.shiny)+'<div><b>'+esc(pretty(BY_ID.get(m.id).n))+'</b><small>'+TRAITS[m.trait].n+' · '+BY_ID.get(m.id).t.join(' / ')+'</small></div>'+(state.active===i?'<span class="active-tag">ACTIVE</span>':'<span class="mon-level">Lv. '+m.lv+'</span>')+'</button>').join('');
- $('daily').disabled=state.days.includes(new Date().toISOString().slice(0,10));$('daily').textContent=$('daily').disabled?'Claimed':'Claim';
+ text('coins',Math.floor(state.coins).toLocaleString());text('tickets',state.tickets.toLocaleString());text('trainer-level',String(state.trainer).padStart(2,'0'));text('rank-label',state.trainer<5?'A new beginning':state.trainer<14?'Finding your own path':state.trainer<24?'Between sea and stars':'Keeper of the sky');
+ text('xp-text',Math.floor(state.xp)+' / '+xpNeeded(state.trainer));$('xp-bar').style.width=clamp(state.xp/xpNeeded(state.trainer)*100,0,100)+'%';text('kill-count',state.kills);text('dex-count',new Set(state.party.map(m=>m.id)).size);text('sigil-count',state.sigils.length+'/7');
+ if($('avatar').getAttribute('src')!==sprite(m.id,m.shiny))$('avatar').src=sprite(m.id,m.shiny);text('mon-name',pretty(p.n)+(m.shiny?' ✧':''));text('level-label','Lv. '+m.lv);text('q-name',pretty(p.t[0])+' bolt');text('potion-count',state.potions+' potions');text('point-count',m.points?m.points+' skill points to spend':'Build your own playstyle');text('bank-summary',state.bank.toLocaleString()+' coins protected');text('net-dot',coop.role==='solo'?'solo':coop.role==='host'?(coop.connections.size+1)+'/'+coop.maxPlayers:coop.host?.open?'joined':'linking');
+ text('chapter-name',ISLANDS[world.id].name);text('chapter-sub',ISLANDS[world.id].sub);
+ text('weather-label',({petals:'❀ Petal breeze',rain:'☂ Passing rain',embers:'♨ Drifting embers',snow:'❄ Gentle snowfall',wisps:'✧ Moonlit wisps',stars:'✦ Starlight'})[world.map.weather]);
+ setStableHTML($('roster'),state.party.slice(0,3).map((m,i)=>'<button class="companion" data-equip="'+i+'">'+img(m.id,m.shiny)+'<div><b>'+esc(pretty(BY_ID.get(m.id).n))+'</b><small>'+TRAITS[m.trait].n+' · '+BY_ID.get(m.id).t.join(' / ')+'</small></div>'+(state.active===i?'<span class="active-tag">ACTIVE</span>':'<span class="mon-level">Lv. '+m.lv+'</span>')+'</button>').join(''));
+ $('daily').disabled=state.days.includes(new Date().toISOString().slice(0,10));text('daily',$('daily').disabled?'Claimed':'Claim');
  $('quest-dot').style.display=QUESTS.some(q=>!state.claimed.includes(q.id)&&questProgress(state,q)>=q.goal)?'inline-block':'none';
- const nextIsland=ISLANDS.find(i=>state.trainer<i.level);$('next-unlock').innerHTML=nextIsland?'<b>Next: '+nextIsland.name+'</b><span>Trainer Lv. '+nextIsland.level+' · '+(nextIsland.level-state.trainer)+' levels away</span>':'<b>Every island unlocked</b><span>Seek the seven guardian sigils</span>';
- const current=QUESTS.find(q=>!state.claimed.includes(q.id));if(current){$('objective-title').textContent=current.name;$('objective-desc').textContent=current.desc+' ('+Math.min(current.goal,questProgress(state,current))+'/'+current.goal+'). '+current.tickets+' summon tickets and XP await in your Journal.';}
+ const nextIsland=ISLANDS.find(i=>state.trainer<i.level);setStableHTML($('next-unlock'),nextIsland?'<b>Next: '+nextIsland.name+'</b><span>Trainer Lv. '+nextIsland.level+' · '+(nextIsland.level-state.trainer)+' levels away</span>':'<b>Every island unlocked</b><span>Seek the seven guardian sigils</span>');
+ const current=QUESTS.find(q=>!state.claimed.includes(q.id));if(current){text('objective-title',current.name);text('objective-desc',current.desc+' ('+Math.min(current.goal,questProgress(state,current))+'/'+current.goal+'). '+current.tickets+' summon tickets and XP await in your Journal.');}
 }
 function updateHUD(){
  const now=performance.now();if(now-lastHUD<90)return;lastHUD=now;const st=world.stat(),p=world.p;
- $('hp-bar').style.width=clamp(p.hp/st.hp*100,0,100)+'%';$('mp-bar').style.width=clamp(p.mp/st.mana*100,0,100)+'%';$('hp-text').textContent=Math.ceil(p.hp)+' / '+st.hp+' HP';$('mp-text').textContent=Math.floor(p.mp)+' / '+st.mana+' MANA';
+ $('hp-bar').style.width=clamp(p.hp/st.hp*100,0,100)+'%';$('mp-bar').style.width=clamp(p.mp/st.mana*100,0,100)+'%';text('hp-text',Math.ceil(p.hp)+' / '+st.hp+' HP');text('mp-text',Math.floor(p.mp)+' / '+st.mana+' MANA');
  $('skill-q').querySelector('i').style.height=p.q/(1.4*(1-st.cdr))*100+'%';$('skill-e').querySelector('i').style.height=p.e/(5*(1-st.cdr))*100+'%';$('dash').querySelector('i').style.height=p.dc/2*100+'%';
- $('mode-label').textContent=!world.id?'SAFE HAVEN':world.mode==='rift'?'RIFT · WAVE '+world.wave:'WILDS · LV. '+world.map.mobMin+'–'+world.map.mobMax;
- $('safe-label').textContent=!world.id?'✦ Rest & recover · your coins are safe':world.mode==='rift'?'✧ Clear each wave to earn tickets':'◈ Defeat costs 50% of carried coins';
- const mins=Math.floor((world.time*4+420)%1440);$('world-clock').textContent=String(Math.floor(mins/60)).padStart(2,'0')+':'+String(mins%60).padStart(2,'0');
- const near=world.near();$('interact-hint').hidden=!near;if(near)$('interact-hint').querySelector('span').textContent=near.label;
- const boss=world.enemies.find(e=>e.boss&&e.hp>0);$('boss-ui').hidden=!boss;if(boss){$('boss-name').textContent=pretty(BY_ID.get(boss.id).n)+' · Lv. '+boss.level+(boss.phase?' · PHASE II':'');$('boss-hp').textContent=Math.ceil(boss.hp).toLocaleString()+' / '+Math.ceil(boss.max).toLocaleString();$('boss-bar').style.width=Math.max(0,boss.hp/boss.max*100)+'%';}
+ text('mode-label',!world.id?'SAFE HAVEN':world.mode==='rift'?'RIFT · WAVE '+world.wave:'WILDS · LV. '+world.map.mobMin+'–'+world.map.mobMax);
+ text('safe-label',!world.id?t('✦ Rest & recover · your coins are safe','✦ 休息回復 · 主城金幣安全'):world.mode==='rift'?t('✧ Clear each wave to earn tickets','✧ 完成每波挑戰獲得召喚券'):t('◈ Defeat costs 50% of carried coins','◈ 倒下損失 50% 隨身金幣'));
+ const mins=Math.floor((world.time*4+420)%1440);text('world-clock',String(Math.floor(mins/60)).padStart(2,'0')+':'+String(mins%60).padStart(2,'0'));
+ const near=world.near();$('interact-hint').hidden=!near;if(near)setLocalizedText($('interact-hint').querySelector('span'),near.label);
+ const boss=world.enemies.find(e=>e.boss&&e.hp>0);$('boss-ui').hidden=!boss;if(boss){text('boss-name',pretty(BY_ID.get(boss.id).n)+' · Lv. '+boss.level+(boss.phase?' · PHASE II':''));text('boss-hp',Math.ceil(boss.hp).toLocaleString()+' / '+Math.ceil(boss.max).toLocaleString());$('boss-bar').style.width=Math.max(0,boss.hp/boss.max*100)+'%';}
 }
-function closePanel(){dialogue.close();panel='';$('modal').hidden=true;world.paused=false;world.keys={};$('world').focus();}
+function closePanel(){dialogue.close();panel='';panelRefresh=null;$('modal').hidden=true;world.paused=false;world.keys={};$('world').focus();}
 const MENU_SCENES={
  'Haven Bank':['bank','Protect your coins before an expedition.'],
  'Artisan’s Forge':['forge','Brew supplies, refine your charm and prepare your next build.'],
@@ -62,15 +65,15 @@ const MENU_SCENES={
  'Expedition Supplies':['camp','Field provisions for the next stretch of your journey.']
 };
 function modal(title,body,eyebrow='YOUR ADVENTURE, YOUR WAY'){const scene=MENU_SCENES[title];if(scene)body=serviceHero(scene[0],title,scene[1])+body; $('modal-title').textContent=title;$('modal-eyebrow').textContent=eyebrow;$('modal-body').innerHTML=body;}
-let lastFocus=null;
-function openPanel(which){
+let lastFocus=null,panelRefresh=null;
+function openPanel(which,{refresh=false}={}){
  if(!hasSave)return;
  if(world.p.dying)return;
  if(['bank','forge','summon','gearshop','market'].includes(which)&&world.id!==0){toast('Return to Aether Haven to use the '+which+'.');return;}
  if(which==='home'){world.travel(0);return;}
- lastFocus=document.activeElement;panel=which;world.keys={};world.paused=coop.role==='solo';$('modal').hidden=false;
+ if(!refresh&&$('modal').hidden)lastFocus=document.activeElement;panel=which;panelRefresh=null;world.keys={};world.paused=coop.role==='solo';$('modal').hidden=false;
  if(which.startsWith('talk-')){dialogue.open(which.slice(5));$('close-modal').focus();return;}
- dialogue.close();const renders={...expansion,...chronicles,atlas:renderAtlas,collection:()=>{page=0;filter='';renderCollection();},summon:renderSummon,skills:renderSkills,quests:renderQuests,bank:renderBank,forge:renderForge,guide:renderGuide,settings:renderSettings,party:renderParty,rift:renderRift};
+ dialogue.close();const renders={...expansion,...chronicles,atlas:renderAtlas,collection:()=>{if(!refresh){page=0;filter='';}renderCollection();},summon:renderSummon,skills:renderSkills,quests:renderQuests,bank:renderBank,forge:renderForge,guide:renderGuide,settings:renderSettings,party:renderParty,rift:renderRift};
  (renders[which]||renderGuide)();$('close-modal').focus();
 }
 function renderAtlas(){
@@ -79,6 +82,7 @@ function renderAtlas(){
  modal('Island Atlas','<p class="panel-intro">Eight distinct pixel regions, including cities, castles and ports. Travel restores HP and Mana. Everyone chooses their own island in a shared world. Unlocks now continue through trainer Lv. 58.</p>'+progress+'<div class="atlas-grid">'+ISLANDS.map(i=>{const locked=state.trainer<i.level;return '<article class="island-card '+(locked?'island-locked':'')+'"><div class="island-scene"><img src="'+sceneArt(i.id)+'" alt="'+i.name+' pixel landscape" loading="lazy"><span class="island-level">'+(!i.id?'SAFE TOWN':'UNLOCK · LV. '+i.level)+'</span></div><div class="island-info"><small>'+(!i.id?'BANK · SHOPS · RECOVERY':(state.sigils.includes(i.id)?'GUARDIAN SIGIL EARNED':'EXPEDITION '+i.id+' / 7'))+'</small><h3>'+i.name+'</h3><p>'+i.desc+'</p>'+(i.id?'<div class="island-facts"><span>'+pixelIcon('sword')+'Wild Lv. '+i.mobMin+'–'+i.mobMax+'</span><span>'+pixelIcon('shield')+pretty(BY_ID.get(i.boss).n)+' · Lv. '+i.bossLevel+'</span><span>'+pixelIcon('star')+Math.floor((18+i.mobMin*7)*(1+i.id*.35))+'–'+Math.floor((18+i.mobMax*7)*(1+i.id*.35))+' base XP / wild defeat</span></div><div class="encounter-strip">'+i.mobs.slice(0,5).map(id=>img(id,false,'loading="lazy"')).join('')+'<span>+5 species</span></div>':'<div class="island-facts"><span>'+pixelIcon('coin')+'Banked coins stay safe</span><span>'+pixelIcon('heart')+'Rest and restore your party</span></div>')+'<div class="button-row"><button data-travel="'+i.id+'" '+(locked?'disabled':'')+'>'+(world.id===i.id?'You are here':locked?'Requires trainer Lv. '+i.level:'Travel to island ↗')+'</button>'+(i.id?'<button data-encounters="'+i.id+'" class="secondary">View encounters</button>':'')+'</div></div></article>';}).join('')+'</div><p class="notice">Wild levels use the ranges above. Rift waves add their wave number to the region’s starting level; Rift guardians add the wave number to their guardian level. Type matchups and equipment matter more on later islands.</p>','YOUR EXPEDITION ROUTE');
 }
 function renderEncounters(id){
+ panelRefresh=()=>renderEncounters(id);
  const i=ISLANDS[id];if(!i?.id)return;
  modal(i.name+' · Encounters','<div class="encounter-header"><img src="'+sceneArt(id)+'" alt="'+i.name+'"><div><h3>Trainer Lv. '+i.level+' unlock</h3><p>Wild Pokémon Lv. '+i.mobMin+'–'+i.mobMax+' · Guardian Lv. '+i.bossLevel+'</p><button data-panel="atlas" class="secondary">Back to atlas</button></div></div><div class="encounter-grid">'+i.mobs.map(n=>{const p=BY_ID.get(n);return '<article class="encounter-card">'+img(n,false,'loading="lazy"')+'<h3>'+pretty(p.n)+'</h3><b>Lv. '+i.mobMin+'–'+i.mobMax+'</b><small class="enemy-role">'+({healer:'Healer · restores allies',ranger:'Ranged · keeps its distance',skirmisher:'Skirmisher · faster pursuit',brawler:'Brawler · close combat'})[enemyRole(p)]+'</small>'+typeTags(p)+'</article>';}).join('')+'</div><article class="guardian-profile">'+img(i.boss)+'<div><span class="eyebrow">ISLAND GUARDIAN</span><h3>'+pretty(BY_ID.get(i.boss).n)+' · Lv. '+i.bossLevel+'</h3><p>Visit the northern altar to challenge this guardian. Move out of red attack zones. A victory grants a sigil, summon tickets, an equipment voucher and guaranteed equipment loot.</p>'+typeTags(BY_ID.get(i.boss))+'</div></article>','FIELD ENCOUNTER GUIDE');
 }
@@ -89,6 +93,7 @@ function renderCollection(){
  modal(dexMode?'The complete Pokédex':'Your growing sanctuary','<p class="panel-intro">'+(dexMode?'All 1,025 species are available in the summon pool. The six base stats and typings come from PokéAPI. Alternate forms are not included.':'Every companion has its own IVs, trait, level and skill build. Your first six companions share XP; you can reorder them here. '+state.party.length+'/300 sanctuary spaces used.')+'</p>'+filters+'<div class="mon-grid">'+list.slice(page*24,(page+1)*24).map(p=>'<article class="mon-card '+(p.index===state.active?'active':'')+'"><span class="card-num">#'+String(p.id).padStart(4,'0')+'</span>'+(p.mon?.shiny?'<span class="shiny">✧</span>':'')+img(p.id,p.mon?.shiny,'loading="lazy"')+'<h3>'+esc(pretty(p.n))+'</h3>'+typeTags(p)+'<small>'+ (p.mon?'Lv. '+p.mon.lv+' · '+TRAITS[p.mon.trait].n+'<br>IV '+p.mon.iv.reduce((a,b)=>a+b,0)+'/186':RARITIES[rarityOf(p)]+' · BST '+p.s.reduce((a,b)=>a+b,0))+'</small><button data-detail="'+(p.index??-1)+'" data-dex-id="'+p.id+'">Inspect</button>'+(p.mon?'<button data-equip="'+p.index+'">'+(p.index===state.active?'Active':'Lead')+'</button>':'')+'</article>').join('')+'</div>'+(list.length?'':'<p class="empty-state">No companions match that search.</p>')+'<div class="pager"><button id="page-prev" class="secondary" '+(page===0?'disabled':'')+'>←</button><span>Page '+(page+1)+' / '+max+'</span><button id="page-next" class="secondary" '+(page===max-1?'disabled':'')+'>→</button></div>','1,025 POSSIBILITIES');
 }
 function renderDetail(index,id){
+ panelRefresh=()=>renderDetail(index,id);
  const m=index>=0?state.party[index]:null,p=BY_ID.get(m?.id||id),st=m?stats(m,state.gear,itemBonuses(state)):null,e=m?evolutionFor(m):null;
  modal(pretty(p.n),'<div class="skill-overview">'+img(p.id,m?.shiny)+'<div><h3>'+pretty(p.n)+(m?.shiny?' ✧ Shiny':'')+'</h3>'+typeTags(p)+'<p>'+ (m?'Level '+m.lv+' · '+TRAITS[m.trait].n+' · Ascension '+m.rank+'/5':'Pokédex #'+p.id+' · '+RARITIES[rarityOf(p)])+'</p></div></div>'+(st?statGrid(st):'')+'<table class="iv-table"><tr><th>STAT</th><th>POKÉMON BASE</th><th>INDIVIDUAL VALUE</th></tr>'+['HP','Attack','Defence','Sp. attack','Sp. defence','Speed'].map((n,i)=>'<tr><td>'+n+'</td><td>'+p.s[i]+'</td><td>'+(m?m.iv[i]+' / 31':'—')+'</td></tr>').join('')+'</table>'+(m?'<div class="button-row"><button data-equip="'+index+'" class="primary">'+(index===state.active?'Currently leading':'Set as leader')+'</button><button data-front="'+index+'" class="secondary">Move into first six</button><button data-reroll="'+index+'" class="secondary">Reforge IVs · 12 stardust</button><button data-ascend="'+index+'" class="secondary" '+(m.rank>=5?'disabled':'')+'>Ascend · '+(20+m.rank*15)+' stardust</button></div>'+(e?'<p class="notice">This game offers a simplified evolution path to '+pretty(BY_ID.get(e.id).n)+' at Lv. '+e.level+' for 15 stardust. Branches use the first species evolution; item, trade, form and friendship conditions are simplified.</p><div class="button-row"><button data-evolve="'+index+'" class="secondary" '+(m.lv<e.level||state.shards<15?'disabled':'')+'>Evolve to '+pretty(BY_ID.get(e.id).n)+'</button></div>':'')+'<p class="notice">Reforging replaces all six IVs with a fresh 0–31 roll and can make them worse. Ascension permanently adds +2 Attack and Sp. Attack per rank.</p><div class="button-row"><button data-release="'+index+'" class="secondary danger" '+(index===state.active?'disabled':'')+'>Release companion · +5 stardust</button><button id="back-collection" class="secondary">Back to sanctuary</button></div>':'<p class="notice">Every species uses the shared action-RPG Strike, Element Bolt and Aether Burst, with its primary type determining elemental damage. This is a custom combat system, not the original Pokémon battle engine.</p>'),'COMPANION FIELD NOTES');
  panel='detail';
@@ -135,7 +140,7 @@ document.addEventListener('click',e=>{
  if(id==='close-modal'){closePanel();lastFocus?.focus();return;}
  if(id==='explore'){closePanel();return;}
  if(id==='home-btn'){closePanel();world.travel(0);return;}
- if(id==='sound'||id==='settings-sound'){soundOn=!soundOn;$('sound').textContent='♫ Sound '+(soundOn?'on':'off');sound('heal');if(panel==='settings')renderSettings();return;}
+ if(id==='sound'||id==='settings-sound'){soundOn=!soundOn;text('sound','♫ '+(soundOn?'Sound on':'Sound off'));sound('heal');if(panel==='settings')renderSettings();return;}
  if(id==='attack'){world.attack();return;}if(id==='skill-q'){world.cast(1);return;}if(id==='skill-e'){world.cast(2);return;}if(id==='potion'){world.potion();return;}if(id==='dash'){world.dash();return;}if(id==='interact-btn'){world.interact();return;}
  if(id==='daily'){if(daily(state)){changed();toast('Daily supplies: +3 summon tickets, +1 equipment voucher, +1 potion.','good');sound('heal');}return;}
  if(id==='roll-one'||id==='roll-five'){safeAction(()=>{const n=id==='roll-one'?1:5,results=[];for(let i=0;i<n;i++){lastRoll=roll(state);results.push(pretty(BY_ID.get(lastRoll.mon.id).n));}renderSummon();sound('level');toast(n===1?'Welcome, '+results[0]+'.':results.join(' · '),'good');});return;}
@@ -168,9 +173,9 @@ let pendingSave=null;
 document.addEventListener('click',e=>{if(e.target.closest('#confirm-import')&&pendingSave){coop.leave(false);state=pendingSave;pendingSave=null;world.s=state;saveError='';hasSave=true;world.changeIsland(0);world.recover();changed();closePanel();toast('Your story is ready to continue.','good');}});
 $('modal').querySelector('.modal-backdrop').addEventListener('click',closePanel);
 document.addEventListener('keydown',e=>{
- if(e.key.toLowerCase()==='m'&&!e.repeat&&!(e.target instanceof HTMLInputElement)&&!(e.target instanceof HTMLTextAreaElement)&&!(e.target instanceof HTMLSelectElement)){e.preventDefault();if(panel==='atlas')closePanel();else openPanel('atlas');return;}
- if(e.key==='Escape'&&!$('modal').hidden){e.preventDefault();closePanel();}
- if(e.key==='Tab'&&!$('modal').hidden){const focusable=$('modal').querySelectorAll('button:not(:disabled),a,input,select,textarea'),first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+ if(isAtlasShortcut(e)){e.preventDefault();if(panel==='atlas')closePanel();else openPanel('atlas');return;}
+ if(e.key==='Escape'&&!$('modal').hidden){e.preventDefault();closePanel();lastFocus?.focus();}
+ if(e.key==='Tab'&&!$('modal').hidden){const focusable=$('modal').querySelectorAll('button:not(:disabled),a,input,select,textarea'),first=focusable[0],last=focusable[focusable.length-1];if(!first)return;if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
 });
 for(const btn of document.querySelectorAll('[data-key]')){const k=btn.dataset.key.toLowerCase();btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);world.keys[k]=true;});for(const event of ['pointerup','pointercancel','lostpointercapture'])btn.addEventListener(event,()=>world.keys[k]=false);}
 function restartAdventure(){
@@ -178,7 +183,7 @@ function restartAdventure(){
  hasSave=false;saveError='';coop.leave(false);pendingSave=null;clearTimeout(collectionTimer);state=newGame();world.s=state;
  page=0;filter='';typeFilter='';dexMode=false;selected=25;lastRoll=null;lastHUD=0;world.time=0;world.rings=[];
  world.changeIsland(0,false);world.recover();Object.assign(world.p,{face:1,dir:0,walking:false,action:null,actionUntil:0,move:0,hit:0,dash:0,dc:0});
- closePanel();world.paused=true;renderStarters();updateUI();$('transition').classList.remove('on');$('start-screen').hidden=false;$('save-status').textContent='Choose a partner to start a new adventure';$('starters').querySelector('[data-starter="25"]')?.focus();
+ closePanel();world.paused=true;renderStarters();updateUI();$('transition').classList.remove('on');$('start-screen').hidden=false;text('save-status','Choose a partner to start a new adventure');$('starters').querySelector('[data-starter="25"]')?.focus();
 }
 function renderStarters(){ $('starters').innerHTML=[1,4,7,25].map(id=>'<button data-starter="'+id+'" class="'+(id===selected?'chosen':'')+'">'+img(id)+'<b>'+pretty(BY_ID.get(id).n)+'</b></button>').join('');}
 $('starters').addEventListener('click',e=>{const b=e.target.closest('[data-starter]');if(b){selected=+b.dataset.starter;renderStarters();}});
@@ -188,5 +193,10 @@ updateUI();
 if(!hasSave){world.paused=true;$('start-screen').hidden=false;renderStarters();}else toast('Welcome back. Your companions missed you.','good');
 if(saveError)toast(saveError,'bad');
 
-document.addEventListener('aether-language',()=>{updateUI();if(panel)openPanel(panel);});
+document.addEventListener('aether-language',()=>{
+ updateUI();lastHUD=-Infinity;updateHUD();if(!panel)return;
+ const body=$('modal-body'),scroll=body.scrollTop,focusId=document.activeElement?.id;
+ if(panelRefresh)panelRefresh();else openPanel(panel,{refresh:true});
+ body.scrollTop=scroll;if(focusId)$(focusId)?.focus();
+});
 installI18n();
