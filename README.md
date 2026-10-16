@@ -8,7 +8,7 @@ No account, purchase, build step or API key is required. Use a current desktop b
 
 ## What you can play
 
-- **Eight 3600 × 2600 regions:** a safe town, forest, harbour, citadel, keep, industrial district, moonlit city and astral palace, with distinct architecture and guardians.
+- **Eight 4800 × 3400 regions:** a safe town, forest, harbour, citadel, keep, industrial district, moonlit city and astral palace, with distinct architecture and guardians.
 - **1,025 collectible species:** bundled PokéAPI base stats, dual types, type effectiveness, Legendary/Mythical classifications and evolution relationships.
 - **Real-time action combat:** WASD movement, melee, aimed elemental projectiles, area damage, Mana regeneration, dodge invulnerability and telegraphed guardian attacks.
 - **Permanent progression:** trainer levels unlock islands; each companion has its own XP, six IVs, trait, shiny status, skill points and ascension rank.
@@ -80,7 +80,7 @@ IV reforging costs 12 stardust and can make stats worse. Releasing a companion g
 
 ## Market district and expedition systems (v1.2)
 
-Every region now uses a 3600 × 2600 world (v1.4), expanded from the 3000 × 2200 v1.2 map and original 1800 × 1400 map. The eastern roads lead to additional districts and three exploration landmarks per combat island. Each landmark awards XP once, and each nearby cache can be claimed once per profile for coins, stardust and an equipment voucher. Resources regrow during active simulation.
+Every region now uses a 4800 × 3400 world (v1.5), expanded from the 3000 × 2200 v1.2 map and original 1800 × 1400 map. The eastern roads lead to additional districts and three exploration landmarks per combat island. Each landmark awards XP once, and each nearby cache can be claimed once per profile for coins, stardust and an equipment voucher. Resources regrow during active simulation.
 
 | Haven service | Purpose |
 | --- | --- |
@@ -247,3 +247,32 @@ Regular defeats have an 8% equipment-drop chance before talent bonuses. Guardian
 Each regional banner has separate guarantees: Legendary+ by draw 20 and Ultra by draw 100. A qualifying result resets its corresponding counter. Item quality remains 80–120%, with independent 1/128 shiny odds. The original equipment banner retains its own 50/200 guarantees. All tickets and seals are earned through play.
 
 Old saves add empty talent/seal/NPC-gift records without resetting their collection or money. Multiplayer protocol v4 separates these larger maps from older clients and synchronises boss warnings, entrances, phase cut-ins and falling bodies. The same browser-hosted eight-player/four-player limits apply. Automated checks cover save migration, talent prerequisites and budgets, seal accounting/pity, reward-once behaviour, damage bounds, fallbacks and the in-memory multiplayer protocol. Internet WebRTC and the rendered browser layout require separate live verification.
+
+
+## Living Frontiers (v1.5)
+
+The v1.4.1 hotfix removed English/Chinese HUD flicker by localising before updating the DOM and skipping unchanged text. Translation now processes changed subtrees before paint, preserves select-option values and is reversible. M works after using the language selector, while text-entry and IME composition remain protected. Collection search, inspected companions and encounter pages survive language changes. The drawn minimap now has an accessible click/touch button that opens the atlas.
+
+Every region is now 4800 × 3400 (74% more area than v1.4), with connected eastern/southern terraces, three named outer districts, three additional service buildings, extended roads and biome-specific scenery. Raised soil beds, projected chair/table surfaces, roof planes, deep side walls, recessed windows, stone foundations and water-facing rock banks add visual elevation using original pixel geometry. The marine archive, harbour hall and lighthouse have different silhouettes. Twenty-seven Pokémon NPCs have conversations, including fourteen new outer-district residents.
+
+Open **Island Atlas** to see the current region map. Click a numbered outer-district marker, service or guardian marker to track it. The world and minimap show the destination and distance; this is navigation, not teleportation. Region travel remains available in the atlas cards. World simulation uses a spatial collision index and culls distant scenery before sorting draw layers. Encounter populations redistribute around explorers so distant districts have local combat instead of leaving every enemy near arrival.
+
+### Regional stories
+
+Open **Regional stories**, visit the appropriate region, and accept its current chapter. Hunting, gathering and conversation count after acceptance; previously discovered outer districts and opened caches are remembered. Each region has three authored chapters, one-time rewards, a collectible emblem and a material-paid recipe. Completing all seven grants a modest total of +28 HP and +7 Mana. Existing companion skills, talents and equipment remain separate.
+
+| Region | Story | Collection | Unlocked recipe |
+| --- | --- | --- | --- |
+| Verdant Wilds | Restore the watchtree, patrol seedlings, calm the guardian | Living Seed | 2 herbs + 40 coins → 2 potions |
+| Coral Coast | Recover tide charts, repair the harbour light, break the undertow | Tide Compass | 3 ore + 60 coins → 3 stardust |
+| Cinder Citadel | Inspect fuel, investigate bastion/furnace road, recover the seal | Ember Core | 8 ore + 8 stardust + 160 coins → 1 equipment voucher |
+| Frostveil Keep | Find shelter, recover courier supplies, clear the frozen route | Hearth Bell | 5 herbs + 2 ore + 90 coins → 5 potions |
+| Stormglass Foundry | Ground the city, synchronise relay/generator, recover a fuse | Grounding Coil | 6 ore + 14 stardust + 140 coins → 1 equipment voucher |
+| Moonshade City | Read unsent letters, follow three lantern districts, restore dawn | Dawn Lantern | 6 herbs + 10 stardust + 180 coins → 1 summon ticket |
+| Astral Palace | Rebuild the star map and astrolabe, leave a safe path | Astral Astrolabe | 8 ore + 8 herbs + 240 coins → 10 potions + 6 stardust |
+
+The final chapter in each region also grants a regional guardian seal and summon ticket; chapter two grants an equipment voucher. Chapter XP and coins scale with region. Rewards cannot be claimed twice. Recipes require the completed story, enough materials and a visit to that region. They do not create a material/coin conversion loop.
+
+Starting a new Rift clears expired encounter effects. An active guardian cannot be erased by opening a Rift, and another explorer cannot restart an already active shared Rift or reset its wave/Arceus timer. Boss phase cut-ins now give a protected pause before the next warning pattern. Multiplayer protocol v5 separates the expanded terrain from earlier clients; existing host/session limitations still apply.
+
+Validation adds twenty-one-chapter completion, event routing, one-time claim and recipe accounting, old-save migration, district reachability, collision equivalence, map destinations, repeated-Rift protection and no-write bilingual HUD regressions. These automated checks and mocked menu/render checks do not replace actual browser layout or cross-network WebRTC playtests.

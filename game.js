@@ -1,12 +1,14 @@
-import {installChronicles} from './chronicle-ui.js?v=1.4.1';
-import {installDialogue} from './dialogue.js?v=1.4.1';
-import {installI18n,t,translateText,setLocalizedText,isAtlasShortcut} from './i18n.js?v=1.4.1';
-import {pixelIcon,sceneArt,serviceHero} from './ui-art.js?v=1.4.1';
-import {installExpansion} from './expansion-ui.js?v=1.4.1';
-import {itemBonuses} from './items.js?v=1.4.1';
-import {DEX,BY_ID,ISLANDS,COLORS,RARITIES,RARITY_COLORS,TRAITS,SKILLS,QUESTS,pretty,stats,newGame,roll,xpNeeded,deposit,withdraw,spendPoint,questProgress,claimQuest,daily,validateSave,evolutionFor,evolve,rarityOf,clamp,enemyRole} from './core.js?v=1.4.1';
-import {World} from './world.js?v=1.4.1';
-import {Coop} from './coop.js?v=1.4.1';
+import {installExpeditions} from './expedition-ui.js?v=1.5.0';
+import {regionMapHTML,installNavigation} from './navigation.js?v=1.5.0';
+import {installChronicles} from './chronicle-ui.js?v=1.5.0';
+import {installDialogue} from './dialogue.js?v=1.5.0';
+import {installI18n,t,translateText,setLocalizedText,isAtlasShortcut} from './i18n.js?v=1.5.0';
+import {pixelIcon,sceneArt,serviceHero} from './ui-art.js?v=1.5.0';
+import {installExpansion} from './expansion-ui.js?v=1.5.0';
+import {itemBonuses} from './items.js?v=1.5.0';
+import {DEX,BY_ID,ISLANDS,COLORS,RARITIES,RARITY_COLORS,TRAITS,SKILLS,QUESTS,pretty,stats,newGame,roll,xpNeeded,deposit,withdraw,spendPoint,questProgress,claimQuest,daily,validateSave,evolutionFor,evolve,rarityOf,clamp,enemyRole} from './core.js?v=1.5.0';
+import {World} from './world.js?v=1.5.0';
+import {Coop} from './coop.js?v=1.5.0';
 const $=id=>document.getElementById(id), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sprite=(id,shiny=false)=>'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/'+(shiny?'shiny/':'')+id+'.png';
 const img=(id,shiny=false,attrs='')=>'<img src="'+sprite(id,shiny)+'" alt="'+esc(pretty(BY_ID.get(id).n))+'" '+attrs+'>';
@@ -26,6 +28,8 @@ const world=new World($('world'),state,{toast,sound,panel:openPanel,changed:chan
 const coop=new Coop(world,()=>{world.paused=!!panel&&coop.role==='solo';updateUI();if(panel==='party')renderParty();},toast);
 const expansion=installExpansion({state:()=>state,world,coop,modal,changed,toast,esc});
 const chronicles=installChronicles({state:()=>state,world,coop,modal,changed,toast,esc});
+const expeditionsUI=installExpeditions({state:()=>state,world,coop,modal,changed,toast,esc});
+installNavigation({world,close:closePanel,toast});
 const dialogue=installDialogue({state:()=>state,world,modal,changed,toast,esc,close:closePanel});
 function save(){if(!hasSave||saveError)return;try{localStorage.setItem('aether-save-v1',JSON.stringify(state));text('save-status','Adventure saved on this device');}catch(e){text('save-status','Storage unavailable · export a save in settings');}}
 function changed(){updateUI();save();}
@@ -73,13 +77,13 @@ function openPanel(which,{refresh=false}={}){
  if(which==='home'){world.travel(0);return;}
  if(!refresh&&$('modal').hidden)lastFocus=document.activeElement;panel=which;panelRefresh=null;world.keys={};world.paused=coop.role==='solo';$('modal').hidden=false;
  if(which.startsWith('talk-')){dialogue.open(which.slice(5));$('close-modal').focus();return;}
- dialogue.close();const renders={...expansion,...chronicles,atlas:renderAtlas,collection:()=>{if(!refresh){page=0;filter='';}renderCollection();},summon:renderSummon,skills:renderSkills,quests:renderQuests,bank:renderBank,forge:renderForge,guide:renderGuide,settings:renderSettings,party:renderParty,rift:renderRift};
+ dialogue.close();const renders={...expansion,...chronicles,...expeditionsUI,atlas:renderAtlas,collection:()=>{if(!refresh){page=0;filter='';}renderCollection();},summon:renderSummon,skills:renderSkills,quests:renderQuests,bank:renderBank,forge:renderForge,guide:renderGuide,settings:renderSettings,party:renderParty,rift:renderRift};
  (renders[which]||renderGuide)();$('close-modal').focus();
 }
 function renderAtlas(){
  const next=ISLANDS.find(i=>state.trainer<i.level);
  const progress=next?'<div class="next-island"><div>'+pixelIcon('gate')+'<span><b>Next destination: '+next.name+'</b><small>Trainer Lv. '+state.trainer+' / '+next.level+' · '+(next.level-state.trainer)+' levels to go</small></span></div><div class="progress-track"><i style="width:'+Math.min(100,state.trainer/next.level*100)+'%"></i></div></div>':'<div class="notice">All eight islands unlocked. Challenge the Astral guardian at Lv. 70.</div>';
- modal('Island Atlas','<p class="panel-intro">Eight distinct pixel regions, including cities, castles and ports. Travel restores HP and Mana. Everyone chooses their own island in a shared world. Unlocks now continue through trainer Lv. 58.</p>'+progress+'<div class="atlas-grid">'+ISLANDS.map(i=>{const locked=state.trainer<i.level;return '<article class="island-card '+(locked?'island-locked':'')+'"><div class="island-scene"><img src="'+sceneArt(i.id)+'" alt="'+i.name+' pixel landscape" loading="lazy"><span class="island-level">'+(!i.id?'SAFE TOWN':'UNLOCK · LV. '+i.level)+'</span></div><div class="island-info"><small>'+(!i.id?'BANK · SHOPS · RECOVERY':(state.sigils.includes(i.id)?'GUARDIAN SIGIL EARNED':'EXPEDITION '+i.id+' / 7'))+'</small><h3>'+i.name+'</h3><p>'+i.desc+'</p>'+(i.id?'<div class="island-facts"><span>'+pixelIcon('sword')+'Wild Lv. '+i.mobMin+'–'+i.mobMax+'</span><span>'+pixelIcon('shield')+pretty(BY_ID.get(i.boss).n)+' · Lv. '+i.bossLevel+'</span><span>'+pixelIcon('star')+Math.floor((18+i.mobMin*7)*(1+i.id*.35))+'–'+Math.floor((18+i.mobMax*7)*(1+i.id*.35))+' base XP / wild defeat</span></div><div class="encounter-strip">'+i.mobs.slice(0,5).map(id=>img(id,false,'loading="lazy"')).join('')+'<span>+5 species</span></div>':'<div class="island-facts"><span>'+pixelIcon('coin')+'Banked coins stay safe</span><span>'+pixelIcon('heart')+'Rest and restore your party</span></div>')+'<div class="button-row"><button data-travel="'+i.id+'" '+(locked?'disabled':'')+'>'+(world.id===i.id?'You are here':locked?'Requires trainer Lv. '+i.level:'Travel to island ↗')+'</button>'+(i.id?'<button data-encounters="'+i.id+'" class="secondary">View encounters</button>':'')+'</div></div></article>';}).join('')+'</div><p class="notice">Wild levels use the ranges above. Rift waves add their wave number to the region’s starting level; Rift guardians add the wave number to their guardian level. Type matchups and equipment matter more on later islands.</p>','YOUR EXPEDITION ROUTE');
+ modal('Island Atlas',regionMapHTML(world)+'<p class="panel-intro">Eight distinct pixel regions, including cities, castles and ports. Travel restores HP and Mana. Everyone chooses their own island in a shared world. Unlocks now continue through trainer Lv. 58.</p>'+progress+'<div class="atlas-grid">'+ISLANDS.map(i=>{const locked=state.trainer<i.level;return '<article class="island-card '+(locked?'island-locked':'')+'"><div class="island-scene"><img src="'+sceneArt(i.id)+'" alt="'+i.name+' pixel landscape" loading="lazy"><span class="island-level">'+(!i.id?'SAFE TOWN':'UNLOCK · LV. '+i.level)+'</span></div><div class="island-info"><small>'+(!i.id?'BANK · SHOPS · RECOVERY':(state.sigils.includes(i.id)?'GUARDIAN SIGIL EARNED':'EXPEDITION '+i.id+' / 7'))+'</small><h3>'+i.name+'</h3><p>'+i.desc+'</p>'+(i.id?'<div class="island-facts"><span>'+pixelIcon('sword')+'Wild Lv. '+i.mobMin+'–'+i.mobMax+'</span><span>'+pixelIcon('shield')+pretty(BY_ID.get(i.boss).n)+' · Lv. '+i.bossLevel+'</span><span>'+pixelIcon('star')+Math.floor((18+i.mobMin*7)*(1+i.id*.35))+'–'+Math.floor((18+i.mobMax*7)*(1+i.id*.35))+' base XP / wild defeat</span></div><div class="encounter-strip">'+i.mobs.slice(0,5).map(id=>img(id,false,'loading="lazy"')).join('')+'<span>+5 species</span></div>':'<div class="island-facts"><span>'+pixelIcon('coin')+'Banked coins stay safe</span><span>'+pixelIcon('heart')+'Rest and restore your party</span></div>')+'<div class="button-row"><button data-travel="'+i.id+'" '+(locked?'disabled':'')+'>'+(world.id===i.id?'You are here':locked?'Requires trainer Lv. '+i.level:'Travel to island ↗')+'</button>'+(i.id?'<button data-encounters="'+i.id+'" class="secondary">View encounters</button>':'')+'</div></div></article>';}).join('')+'</div><p class="notice">Wild levels use the ranges above. Rift waves add their wave number to the region’s starting level; Rift guardians add the wave number to their guardian level. Type matchups and equipment matter more on later islands.</p>','YOUR EXPEDITION ROUTE');
 }
 function renderEncounters(id){
  panelRefresh=()=>renderEncounters(id);

@@ -1,9 +1,10 @@
-import {WORLD_SIZE} from './pixel-art.js?v=1.4.1';
-import {WorldHub} from './world-hub.js?v=1.4.1';
-import {itemBonuses} from './items.js?v=1.4.1';
-import {awardXP} from './core.js?v=1.4.1';
-import {BY_ID,stats,clamp} from './core.js?v=1.4.1';
-const PREFIX='tides-aether-v4-';
+import {noteExpeditionEvent} from './expeditions.js?v=1.5.0';
+import {WORLD_SIZE} from './pixel-art.js?v=1.5.0';
+import {WorldHub} from './world-hub.js?v=1.5.0';
+import {itemBonuses} from './items.js?v=1.5.0';
+import {awardXP} from './core.js?v=1.5.0';
+import {BY_ID,stats,clamp} from './core.js?v=1.5.0';
+const PREFIX='tides-aether-v5-';
 export class Coop{
  constructor(world,changed,toast){this.w=world;this.changed=changed;this.toast=toast;this.role='solo';this.peer=null;this.connections=new Map();this.host=null;this.code='';this.status='Solo adventure';this.elapsed=0;this.timeout=null;this.name='Explorer';this.maxPlayers=4;this.realm=null;this.hub=null;this.populations=Array(8).fill(0);world.net=this;}
  async boot(fixedCode=null){
@@ -72,7 +73,7 @@ export class Coop{
  if(Array.isArray(msg.populations)&&msg.populations.length===8)this.populations=msg.populations;return;
  }
  if(msg.type==='reward'&&Number.isFinite(msg.coins)&&msg.coins>=0&&msg.coins<100000&&Number.isFinite(msg.xp)&&msg.xp>=0&&msg.xp<100000&&[0,1,3].includes(msg.tickets)&&Number.isInteger(msg.island)&&msg.island>0&&msg.island<8)this.w.grant(msg);
- if(msg.type==='gatherReward'&&['herb','ore'].includes(msg.kind)&&[1,2].includes(msg.amount)&&Number.isInteger(msg.island)&&msg.island>0&&msg.island<8){this.w.s[msg.kind==='herb'?'herbs':'ore']+=msg.amount;this.w.s.gathered++;this.w.s.islandGather[msg.island]++;awardXP(this.w.s,8+msg.island*4);this.w.h.changed();this.toast('Gathered '+msg.amount+' '+msg.kind+' · +'+(8+msg.island*4)+' XP');}
+ if(msg.type==='gatherReward'&&['herb','ore'].includes(msg.kind)&&[1,2].includes(msg.amount)&&Number.isInteger(msg.island)&&msg.island>0&&msg.island<8){this.w.s[msg.kind==='herb'?'herbs':'ore']+=msg.amount;this.w.s.gathered++;this.w.s.islandGather[msg.island]++;noteExpeditionEvent(this.w.s,{kind:'gather',island:msg.island});awardXP(this.w.s,8+msg.island*4);this.w.h.changed();this.toast('Gathered '+msg.amount+' '+msg.kind+' · +'+(8+msg.island*4)+' XP');}
  if(msg.type==='waveReward'&&Number.isInteger(msg.wave)&&msg.wave>0&&msg.wave<10000&&[1,3].includes(msg.tickets)){this.w.s.waveBest=Math.max(this.w.s.waveBest,msg.wave);this.w.s.tickets+=msg.tickets;this.w.s.coins+=40*msg.wave;this.w.h.changed();this.toast('Island cleared wave '+msg.wave+'! +'+msg.tickets+' tickets.','good');}
  if(msg.type==='hurt'&&Number.isFinite(msg.amount))this.w.hurt(clamp(msg.amount,0,100000));
  }

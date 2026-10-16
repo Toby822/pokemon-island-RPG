@@ -6,16 +6,17 @@
  <meta name="description" content="Explore eight islands in a colourful Pokémon action RPG. Summon, train, fight guardians and explore with a friend.">
  <title>Pokémon · Tides of Aether</title>
  <link rel="icon" href="assets/emblem.svg" type="image/svg+xml">
- <link rel="stylesheet" href="style.css?v=1.4.1"><link rel="stylesheet" href="readable.css?v=1.4.1"><link rel="stylesheet" href="chronicles.css?v=1.4.1">
+ <link rel="stylesheet" href="style.css?v=1.5.0"><link rel="stylesheet" href="readable.css?v=1.5.0"><link rel="stylesheet" href="chronicles.css?v=1.5.0">
+ <link rel="stylesheet" href="expedition-style.css?v=1.5.0">
 </head>
 <body>
  <header class="topbar">
   <a class="brand" href="./" aria-label="Tides of Aether home"><img src="assets/emblem.svg" alt=""><span><small>POKÉMON</small><strong>Tides of Aether</strong></span></a>
-  <div class="edition"><span class="online-dot"></span> GUARDIAN CHRONICLES <span class="tag">v1.4 · GUARDIAN CHRONICLES</span></div>
+  <div class="edition"><span class="online-dot"></span> GUARDIAN CHRONICLES <span class="tag">v1.5 · GUARDIAN CHRONICLES</span></div>
   <div class="top-actions"><label class="language-control"><span>Language</span><select id="language-select" aria-label="Language"><option value="en">English</option><option value="zh-Hant">繁體中文</option></select></label><button id="sound" class="subtle" title="Toggle generated sound effects" aria-label="Toggle sound">♫ Sound off</button><button data-panel="guide" class="subtle">? Field guide</button><button data-panel="settings" class="round" aria-label="Save and settings">⚙</button></div>
  </header>
  <nav class="mainnav" aria-label="Game menu">
-  <div class="nav-left"><button class="nav-item selected" id="explore">⌁ <span>Explore</span></button><button class="nav-item" data-panel="collection">◉ <span>Sanctuary</span></button><button class="nav-item" data-panel="equipment">⚔ <span>Equipment</span></button><button class="nav-item" data-panel="talents">✦ <span>Talents</span></button><button class="nav-item" data-panel="bossarmory">♛ <span>Boss Armory</span></button><button class="nav-item" data-panel="summon">✧ <span>Summon</span></button><button class="nav-item" data-panel="atlas">♧ <span>Island atlas</span></button><button class="nav-item" data-panel="quests">☷ <span>Journal</span><i id="quest-dot"></i></button></div>
+  <div class="nav-left"><button class="nav-item selected" id="explore">⌁ <span>Explore</span></button><button class="nav-item" data-panel="collection">◉ <span>Sanctuary</span></button><button class="nav-item" data-panel="equipment">⚔ <span>Equipment</span></button><button class="nav-item" data-panel="talents">✦ <span>Talents</span></button><button class="nav-item" data-panel="bossarmory">♛ <span>Boss Armory</span></button><button class="nav-item" data-panel="summon">✧ <span>Summon</span></button><button class="nav-item" data-panel="atlas">♧ <span>Island atlas</span></button><button class="nav-item" data-panel="expeditions">♜ <span>Regional stories</span></button><button class="nav-item" data-panel="quests">☷ <span>Journal</span><i id="quest-dot"></i></button></div>
   <div class="wallet"><span title="Coins carried; half are lost on defeat"><img src="assets/icons/coin.svg" class="pixel-icon" alt="Coins" width="28" height="28"> <b id="coins">250</b></span><span title="Summon tickets"><img src="assets/icons/ticket.svg" class="pixel-icon" alt="Summon tickets" width="28" height="28"> <b id="tickets">5</b></span><button data-panel="party" class="party-button">♙ Worlds <em id="net-dot">solo</em></button></div>
  </nav>
  <main>
@@ -46,5 +47,5 @@
  <footer><span>POKÉMON · TIDES OF AETHER</span><span>Unofficial, non-commercial fan project · Pokémon © respective owners</span><a href="https://github.com/Toby822/pokemon-island-RPG" target="_blank" rel="noopener">Source & credits ↗</a></footer>
  <div id="modal" class="modal" hidden><div class="modal-backdrop"></div><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-header"><div><span class="eyebrow" id="modal-eyebrow">TIDES OF AETHER</span><h2 id="modal-title"></h2></div><button id="close-modal" aria-label="Close dialog">✕</button></div><div id="modal-body"></div></section></div>
  <div id="start-screen" class="start-screen" hidden><div class="start-card"><img class="start-emblem" src="assets/emblem.svg" alt=""><span class="eyebrow">A NEW ADVENTURE AWAITS</span><h1>Your story.<br>A world worth exploring.</h1><p>Forests, harbours, citadels and the stars.<br>A Pokémon companion by your side.<br>Where will the tide take you?</p><div id="starters" class="starters"></div><p class="start-hint">Choose a companion to begin. Every Pokémon can be summoned later.</p><button id="begin" class="primary">Begin your journey <span>↗</span></button><small>Free fan game · No purchases · Saves on your device</small></div></div>
- <script src="assets/peerjs.min.js" defer></script><script type="module" src="game.js?v=1.4.1"></script>
+ <script src="assets/peerjs.min.js" defer></script><script type="module" src="game.js?v=1.5.0"></script>
 </body></html>

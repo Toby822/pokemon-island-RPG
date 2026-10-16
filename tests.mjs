@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {DEX,POOLS,newGame,createMon,stats,roll,deposit,withdraw,die,awardXP,xpNeeded,spendPoint,claimQuest,daily,validateSave,typeMultiplier,damage,evolutionFor,evolve} from './core.js?v=1.4.1';
+import {DEX,POOLS,newGame,createMon,stats,roll,deposit,withdraw,die,awardXP,xpNeeded,spendPoint,claimQuest,daily,validateSave,typeMultiplier,damage,evolutionFor,evolve} from './core.js?v=1.5.0';
 let count=0;
 function test(name,fn){fn();count++;console.log('PASS '+name);}
 test('1,025 unique species, valid six base stats and types',()=>{assert.equal(DEX.length,1025);assert.equal(new Set(DEX.map(p=>p.id)).size,1025);for(const p of DEX){assert.equal(p.s.length,6);assert(p.s.every(n=>n>0));assert(p.t.length>0);}});

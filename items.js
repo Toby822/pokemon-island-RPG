@@ -1,5 +1,6 @@
-import {talentBonuses,migrateAdventure} from './talents.js?v=1.4.1';
-import {RELIC_WEAPONS} from './relic-weapons.js?v=1.4.1';
+import {migrateExpeditions,expeditionBonuses} from './expeditions.js?v=1.5.0';
+import {talentBonuses,migrateAdventure} from './talents.js?v=1.5.0';
+import {RELIC_WEAPONS} from './relic-weapons.js?v=1.5.0';
 export const ITEM_TIERS=[
  {name:'Common',color:'#a5aab3',chance:60,power:1},
  {name:'Rare',color:'#65a7ff',chance:25,power:1.35},
@@ -37,13 +38,13 @@ export function createItem(template='sabre',tier=0,island=0,rng=Math.random){
 }
 export function itemName(item){return ISLAND_PREFIX[item.island]+' '+ITEM_BY_ID.get(item.template).name;}
 export function migrateItems(s){
- migrateAdventure(s);s.inventory??=[];s.equipment??=Object.fromEntries(SLOTS.map(k=>[k,null]));s.gearPity??=0;s.ultraPity??=0;s.gearRolls??=0;s.equipmentTickets??=3;
+ migrateAdventure(s);migrateExpeditions(s);s.inventory??=[];s.equipment??=Object.fromEntries(SLOTS.map(k=>[k,null]));s.gearPity??=0;s.ultraPity??=0;s.gearRolls??=0;s.equipmentTickets??=3;
  return s;
 }
 export function itemBonuses(s){
  const b={hp:0,atk:0,def:0,sp:0,sd:0,speed:0,mana:0,crit:0,xp:0},seen=new Set();
  for(const id of Object.values(s.equipment||{})){if(!id||seen.has(id))continue;seen.add(id);const item=s.inventory?.find(i=>i.uid===id);if(!item)continue;for(const [k,v] of Object.entries(item.values))b[k]+=v*(1+item.upgrade*.08);}
- const talent=talentBonuses(s);for(const [k,v] of Object.entries(talent))b[k]=(b[k]||0)+v;b.xp=Math.min(.5,b.xp);b.crit=Math.min(.2,b.crit);return b;
+ const story=expeditionBonuses(s);b.hp+=story.hp;b.mana+=story.mana;const talent=talentBonuses(s);for(const [k,v] of Object.entries(talent))b[k]=(b[k]||0)+v;b.xp=Math.min(.5,b.xp);b.crit=Math.min(.2,b.crit);return b;
 }
 export function equipItem(s,id,slot){
  const item=s.inventory.find(i=>i.uid===id);if(!item||!SLOTS.includes(slot))throw Error('Choose a valid item and slot.');

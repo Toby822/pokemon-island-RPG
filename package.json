@@ -1,10 +1,10 @@
 {
   "name": "pokemon-tides-of-aether",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests.mjs && node animation-tests.mjs && node systems-tests.mjs && node coop-tests.mjs && node world-tests.mjs && node chronicles-tests.mjs && node ui-stability-tests.mjs",
+    "test": "node tests.mjs && node animation-tests.mjs && node systems-tests.mjs && node coop-tests.mjs && node world-tests.mjs && node chronicles-tests.mjs && node expedition-tests.mjs && node expedition-integration-tests.mjs && node ui-stability-tests.mjs",
     "start": "node serve.mjs",
     "art": "node tools/build-art.mjs"
   },

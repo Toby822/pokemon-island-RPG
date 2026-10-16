@@ -63,3 +63,10 @@ The official Hypixel wiki’s [Weapons](https://wiki.hypixel.net/Weapons), [Drag
 - [Square Enix — OCTOPATH TRAVELER 0](https://www.square-enix.com/asia/newsportal/en/topics/octopathtraveler0/post01.html) informed layered pixel scenery and environmental depth. This project uses its own Canvas 2D geometry.
 - [JPTER78/PokéSurvivor](https://github.com/JPTER78/pokesurvivor) was reviewed for the requested pixel survivor presentation and animation approach. Its textures and gameplay code were not copied.
 - All new architecture in `architecture.js`, telegraph shapes, cinematic frames, equipment silhouettes and regional SVG illustrations are original code-drawn project artwork. Pokémon portraits retain the third-party attribution above. Talent rules, NPC dialogue, weapon profiles, banner odds and boss patterns are this project's original implementation.
+
+
+## Living Frontiers (v1.5)
+
+- [Hypixel Team — Foraging update](https://hypixel.net/threads/hypixel-skyblock-0-23-the-foraging-update.5921261/): reference for residents, regional activities, collections, perk progression and recipe unlocks. The seven three-chapter stories, dialogue, materials, rewards and collection bonuses here are original project content.
+- [Square Enix — Dragon Quest III HD-2D Remake](https://www.square-enix.com/asia/newsportal/en/topics/dragon-quest-iii-hd-2d/post02.html): reference for lighting, shading and environmental depth. This release remains a Canvas 2D renderer and uses original code-drawn wall/roof planes, cliff banks and furniture; it does not use Square Enix art or a 3D engine.
+- Buildings, elevated soil beds, district props and navigation illustrations were built from this project's original pixel painters. No additional third-party terrain textures were introduced.
