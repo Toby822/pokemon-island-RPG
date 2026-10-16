@@ -1,6 +1,6 @@
 {
   "name": "pokemon-tides-of-aether",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
   "scripts": { "test": "node tests.mjs && node animation-tests.mjs && node systems-tests.mjs && node coop-tests.mjs", "start": "node serve.mjs" },

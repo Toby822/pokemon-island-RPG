@@ -172,3 +172,7 @@ GitHub Pages serves the repository root from main, with .nojekyll. The relative 
 ## Attribution
 
 Pokémon names, characters and sprites belong to their respective rights holders. This fan project is not affiliated with Nintendo, Game Freak, Creatures, The Pokémon Company, Hypixel or Pokémon Survivors. [Credits, data sources and third-party notices](CREDITS.md).
+
+### Restarting your adventure
+
+Open the top-right **⚙ Settings → Restart adventure**. You can export a save or cancel before confirming **Delete progress & choose starter**. Confirmation clears this browser’s saved adventure and leaves multiplayer, then returns to the four starter choices. It removes Pokémon, levels, equipment and all money, including the bank. Your fresh adventure is saved after you choose a partner and press **Begin your journey**.
