@@ -1,9 +1,9 @@
-import {pixelIcon,sceneArt,serviceHero} from './ui-art.js';
-import {installExpansion} from './expansion-ui.js';
-import {itemBonuses} from './items.js';
-import {DEX,BY_ID,ISLANDS,COLORS,RARITIES,RARITY_COLORS,TRAITS,SKILLS,QUESTS,pretty,stats,newGame,roll,xpNeeded,deposit,withdraw,spendPoint,questProgress,claimQuest,daily,validateSave,evolutionFor,evolve,rarityOf,clamp,enemyRole} from './core.js';
-import {World} from './world.js';
-import {Coop} from './coop.js';
+import {pixelIcon,sceneArt,serviceHero} from './ui-art.js?v=1.3.0';
+import {installExpansion} from './expansion-ui.js?v=1.3.0';
+import {itemBonuses} from './items.js?v=1.3.0';
+import {DEX,BY_ID,ISLANDS,COLORS,RARITIES,RARITY_COLORS,TRAITS,SKILLS,QUESTS,pretty,stats,newGame,roll,xpNeeded,deposit,withdraw,spendPoint,questProgress,claimQuest,daily,validateSave,evolutionFor,evolve,rarityOf,clamp,enemyRole} from './core.js?v=1.3.0';
+import {World} from './world.js?v=1.3.0';
+import {Coop} from './coop.js?v=1.3.0';
 const $=id=>document.getElementById(id), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sprite=(id,shiny=false)=>'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/'+(shiny?'shiny/':'')+id+'.png';
 const img=(id,shiny=false,attrs='')=>'<img src="'+sprite(id,shiny)+'" alt="'+esc(pretty(BY_ID.get(id).n))+'" '+attrs+'>';

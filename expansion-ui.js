@@ -1,7 +1,7 @@
-import {pixelIcon,sceneArt,buildingArt} from './ui-art.js';
-import {ITEM_TIERS,GEAR_TYPES,ITEM_BY_ID,SLOTS,SLOT_NAMES,itemName,itemBonuses,gearIcon,createItem,equipItem,rollEquipment,salvageItem,upgradeItem} from './items.js';
-import {ISLANDS,awardXP,xpNeeded} from './core.js';
-import {contractList,acceptContract,contractProgress,finishContract,LANDMARKS,combatReward} from './progression.js';
+import {pixelIcon,sceneArt,buildingArt} from './ui-art.js?v=1.3.0';
+import {ITEM_TIERS,GEAR_TYPES,ITEM_BY_ID,SLOTS,SLOT_NAMES,itemName,itemBonuses,gearIcon,createItem,equipItem,rollEquipment,salvageItem,upgradeItem} from './items.js?v=1.3.0';
+import {ISLANDS,awardXP,xpNeeded} from './core.js?v=1.3.0';
+import {contractList,acceptContract,contractProgress,finishContract,LANDMARKS,combatReward} from './progression.js?v=1.3.0';
 export function installExpansion(api){
  const {world,coop,modal,changed,toast,esc}=api;let bagPage=0,bagFilter='',rollKind='all',lastItem=null;
  const state=()=>api.state();

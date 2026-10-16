@@ -1,4 +1,4 @@
-import {awardXP,ISLANDS} from './core.js';
+import {awardXP,ISLANDS} from './core.js?v=1.3.0';
 export const LANDMARKS=[
  {name:'Ranger Outpost',x:1660,y:800,desc:'A trading camp on the edge of the old road.'},
  {name:'Ancient Observatory',x:2200,y:1080,desc:'Watch the sky, then look a little closer.'},

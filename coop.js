@@ -1,7 +1,7 @@
-import {WorldHub} from './world-hub.js';
-import {itemBonuses} from './items.js';
-import {awardXP} from './core.js';
-import {BY_ID,stats,clamp} from './core.js';
+import {WorldHub} from './world-hub.js?v=1.3.0';
+import {itemBonuses} from './items.js?v=1.3.0';
+import {awardXP} from './core.js?v=1.3.0';
+import {BY_ID,stats,clamp} from './core.js?v=1.3.0';
 const PREFIX='tides-aether-v3-';
 export class Coop{
  constructor(world,changed,toast){this.w=world;this.changed=changed;this.toast=toast;this.role='solo';this.peer=null;this.connections=new Map();this.host=null;this.code='';this.status='Solo adventure';this.elapsed=0;this.timeout=null;this.name='Explorer';this.maxPlayers=4;this.realm=null;this.hub=null;this.populations=Array(8).fill(0);world.net=this;}

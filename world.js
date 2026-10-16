@@ -1,8 +1,8 @@
-import {BY_ID,ISLANDS,COLORS,stats,damage,typeMultiplier,clamp,choose,awardXP,die,pretty,enemyRole} from './core.js';
-import {itemBonuses,createItem,GEAR_TYPES,ITEM_TIERS,itemName} from './items.js';
-import {LANDMARKS,discover,openTreasure,combatReward} from './progression.js';
-import {SpriteBank,facing} from './sprites.js';
-import {BIOMES,TOWN_BUILDINGS,regionalBuildings,onIsland,walkableGround,roadAt,paintTerrain,paintObject,paintProp} from './pixel-art.js';
+import {BY_ID,ISLANDS,COLORS,stats,damage,typeMultiplier,clamp,choose,awardXP,die,pretty,enemyRole} from './core.js?v=1.3.0';
+import {itemBonuses,createItem,GEAR_TYPES,ITEM_TIERS,itemName} from './items.js?v=1.3.0';
+import {LANDMARKS,discover,openTreasure,combatReward} from './progression.js?v=1.3.0';
+import {SpriteBank,facing} from './sprites.js?v=1.3.0';
+import {BIOMES,TOWN_BUILDINGS,regionalBuildings,onIsland,walkableGround,roadAt,paintTerrain,paintObject,paintProp} from './pixel-art.js?v=1.3.0';
 export const SIZE={w:3000,h:2200};
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function seeded(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}

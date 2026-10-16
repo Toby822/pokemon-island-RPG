@@ -1,5 +1,5 @@
-import {stats} from './core.js';
-import {combatReward} from './progression.js';
+import {stats} from './core.js?v=1.3.0';
+import {combatReward} from './progression.js?v=1.3.0';
 export class WorldHub{
  constructor(coop){this.coop=coop;this.scenes=new Map();this.clients=new Map();this.elapsed=0;}
  scene(id){

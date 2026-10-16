@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {EventEmitter} from 'node:events';
-import {Coop} from './coop.js';
-import {newGame,stats} from './core.js';
+import {Coop} from './coop.js?v=1.3.0';
+import {newGame,stats} from './core.js?v=1.3.0';
 const registry=new Map();
 class Connection extends EventEmitter{
  constructor(peer){super();this.peer=peer;this.open=false;}

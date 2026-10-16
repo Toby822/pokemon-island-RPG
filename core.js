@@ -1,5 +1,5 @@
-import {migrateItems,validateItems} from './items.js';
-import { DEX, TYPES, EVOLUTION } from './data.js';
+import {migrateItems,validateItems} from './items.js?v=1.3.0';
+import { DEX, TYPES, EVOLUTION } from './data.js?v=1.3.0';
 export { DEX };
 export const VERSION=1;
 export const BY_ID=new Map(DEX.map(p=>[p.id,p]));
