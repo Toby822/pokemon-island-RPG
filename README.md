@@ -75,6 +75,49 @@ Evolution uses real species relationships but simplified thresholds (16 for a fi
 
 IV reforging costs 12 stardust and can make stats worse. Releasing a companion gives 5 stardust and requires an explicit in-game confirmation. Ascension caps at five ranks. Forge equipment is shared across companions and caps at +10.
 
+
+## Market district and expedition systems (v1.2)
+
+Every island now uses a 3000 × 2200 world, expanded from 1800 × 1400. The eastern roads lead to additional districts and three exploration landmarks per combat island. Each landmark awards XP once, and each nearby cache can be claimed once per profile for coins, stardust and an equipment voucher. Resources regrow during active simulation.
+
+| Haven service | Purpose |
+| --- | --- |
+| Haven Bank | Safe deposits; defeat still removes half carried coins |
+| Artisan’s Forge | Brew potions and refine the shared aether charm |
+| Armoury | Weapon, helmet, chest, boots and two accessory slots |
+| Relic Emporium | Earned-voucher equipment draws |
+| Provisioner | Guaranteed vendor equipment, consumables and resource sales |
+| Rangers Guild | Repeatable hunting, gathering and guardian contracts |
+| Archivist | One-time bestiary milestones at 5, 20 and 60 regional defeats |
+| Summon Shrine | Pokémon recruitment and individual-stat rolls |
+
+Use the town directory on the sidebar, or walk to a building and press F. Equipment can be inspected anywhere; vendors and the emporium require Haven. Changing equipment in combat range is blocked. Equipping preserves current HP and Mana percentages.
+
+### Six equipment rarities
+
+| Rarity | Colour | Base draw chance | Power multiplier |
+| --- | --- | ---: | ---: |
+| Common | Gray | 60% | 1.00× |
+| Rare | Blue | 25% | 1.35× |
+| Epic | Purple | 10% | 1.80× |
+| Mythic | Pink | 4% | 2.35× |
+| Legendary | Yellow | 0.9% | 3.00× |
+| Ultra | Gold | 0.1% | 4.00× |
+
+Each item independently rolls 80–120% quality and a 1/128 shiny chance. Shiny adds 5% to rolled stats. Higher unlocked regions improve item power. Equipment draws have their own guarantee: Legendary or better within 50 draws and Ultra within 200. The respective counters reset when that threshold is met naturally. Category selection does not change rarity probabilities. Equipment vouchers are earned in game; no real-money purchase flow exists.
+
+Refinement is guaranteed, costs ore and coins, adds 8% of the original rolled stats per rank and caps at +10. Salvaging returns stardust and requires confirmation; equipped items cannot be salvaged. Accessories can increase XP gain, Mana, speed, survivability or critical chance. An item cannot fill two slots at once.
+
+### XP that rewards risk
+
+Trainer and companion XP thresholds increase as 60 + 35L + 4L². A companion gains three skill points on each level. Base combat XP is floor((18 + 7 × enemy level) × (1 + 0.35 × island index)), multiplied by eight for guardians. Gear can add up to 50% bonus kill XP. Gathering, original journal milestones, new ranger contracts, bestiary milestones and exploration also award XP.
+
+Each combat island offers three repeatable contracts. Accept a maximum of three at a time. Only progress after accepting counts; completing and accepting again resets the baseline. Higher islands raise both target counts and rewards. This prevents accepting an old kill total and repeatedly claiming it without doing new work.
+
+### Shared islands, with a clear hosting limit
+
+This release implements shared islands **within the same eight-player world**. It does not merge HAVEN-1, HAVEN-2 and HAVEN-3 into a global server. The browser host must remain online; an island sleeps while nobody in that session occupies it. Durable global accounts, an always-on authoritative backend, host migration, auctions and trading are outside this release. Local saves migrate without deleting previous Pokémon or currency.
+
 ## Co-op
 
 **Worlds → Enter world** joins HAVEN-1, HAVEN-2 or HAVEN-3 without a code. The first explorer becomes host; later explorers join that host. Each shared world supports up to eight players. These are browser-hosted sessions and close when the host leaves. They are not dedicated always-on servers.
@@ -84,9 +127,9 @@ For a private room (up to four players):
 1. Both players open the game and finish starter selection.
 2. The host opens **Co-op → Create a room**.
 3. Friends enter the six-character code and select **Join a friend**.
-4. The host chooses an island. Connected players move and attack in the same world.
+4. Every player chooses an unlocked island independently. Players on the same island share its enemies, guardian, Rift and resource cooldowns.
 
-The host simulates enemy AI, elemental damage, kills and waves and broadcasts snapshots at 10 Hz. Movement is locally responsive. Kill rewards are broadcast to connected guests. Enemy HP scales with party size when spawned.
+The host owns a separate headless simulation for each occupied island. It simulates enemy AI, elemental damage, kills, waves and resource cooldowns and broadcasts island-specific snapshots at 10 Hz. Movement is locally responsive. Kill rewards go only to living players within 850 world units of the defeat on that island. Players on different islands cannot damage each other’s enemies or receive each other’s kill rewards. Enemy HP scales with the number of players on that island when spawned.
 
 This is an **experimental browser-hosted co-op implementation**, not an MMO. It depends on the public PeerJS signalling service, STUN and browser WebRTC. Some NAT/firewall combinations require a TURN relay that this release does not provide. The host must remain open; host migration, accounts, server-held saves, anti-cheat, trading and cross-session lobbies are not implemented. Do not use local saves or co-op messages as trusted records for competitive play.
 
@@ -100,12 +143,16 @@ Open http://127.0.0.1:4173. Serve over HTTP; opening index.html directly from di
 
     npm test
 
-The automated tests cover the full species pool, type immunity, banking/death accounting, invalid transfers, roll tiers, pity, IV bounds, XP sharing, skill spending, one-time rewards, evolution and corrupt-save rejection.
+The automated tests cover the full species pool, type immunity, banking/death accounting, summons, IVs, XP sharing, skills, evolution, corrupt-save rejection, equipment stats and slot rules, equipment pity, refinement costs, repeatable contracts, one-time exploration rewards, independent multiplayer island travel, isolated combat, shared resource cooldowns and disconnect recovery. Multiplayer protocol tests use an in-memory transport; they do not establish that internet WebRTC works through every NAT/firewall.
 
 ## Implementation
 
 | File | Responsibility |
 | --- | --- |
+| items.js | Six equipment rarities, item rolls, loadouts, refinement and bag validation |
+| progression.js | Regional rewards, repeatable contracts, discoveries and treasure |
+| expansion-ui.js | Equipment, emporium, market, contracts, bestiary and town menus |
+| world-hub.js | Independent island simulations and per-island reward routing |
 | core.js | Combat formulas, economy, summons, quests, progression and save validation |
 | data.js | Local snapshot of default-species data and type effectiveness |
 | sprites.js / pmd-meta.js | Directional sprite sheets, frame timings and starter animation metadata |
@@ -120,7 +167,7 @@ Species data is bundled, so gameplay does not query the live PokéAPI on every r
 
 ## Deployment
 
-GitHub Pages serves the repository root from main, with .nojekyll. The relative asset/module paths also work under the /pokemon-island-RPG/ project prefix. The gameplay CI workflow runs the core tests on changes.
+GitHub Pages serves the repository root from main, with .nojekyll. The relative asset/module paths also work under the /pokemon-island-RPG/ project prefix. The gameplay CI workflow checks all JS/MJS syntax and runs every gameplay, animation, equipment, progression and protocol test on changes.
 
 ## Attribution
 

@@ -40,3 +40,7 @@ An unofficial non-commercial fan project. The source is visible for inspection; 
 - Other species are loaded from SpriteCollab on demand. Their original per-species credit files remain accessible in the source repository.
 - Sheets are displayed with nearest-neighbour scaling; a hue shift distinguishes shiny companions. No claim is made that the hue shift reproduces canonical shiny colours.
 - [PMD sprite format](https://wiki.pmdo.pmdcollab.org/PMD_Sprite_Format) documents frame ordering and 1/60-second duration units.
+
+## v1.2 systems research
+
+The official Hypixel wiki’s [Weapons](https://wiki.hypixel.net/Weapons), [Dragontail Blacksmith](https://wiki.hypixel.net/Dragontail_Blacksmith) and [Quests](https://wiki.hypixel.net/Quests) pages informed the broad shop, refinement and progression loops. Item names, rarity odds, formulas, equipment art and implementation in this release are custom and do not reproduce Hypixel’s code or exact balance.

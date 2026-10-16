@@ -1,3 +1,4 @@
+import {migrateItems,validateItems} from './items.js';
 import { DEX, TYPES, EVOLUTION } from './data.js';
 export { DEX };
 export const VERSION=1;
@@ -45,19 +46,19 @@ export function createMon(id,rng=Math.random,minIV=0){
  return {uid:typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+rng(),id,lv:1,xp:0,iv:Array.from({length:6},()=>minIV+Math.floor(rng()*(32-minIV))),trait:Math.floor(rng()*TRAITS.length),shiny:rng()<1/512,points:0,skills:{vitality:0,strength:0,arcana:0,guard:0,haste:0},rank:0};
 }
 export function newGame(id=25){
- return {version:VERSION,trainer:1,xp:0,coins:250,bank:0,tickets:5,shards:0,ore:0,herbs:0,potions:4,pity:0,rolls:0,kills:0,bosses:0,gathered:0,waveBest:0,claimed:[],visited:[0],sigils:[],party:[createMon(id)],active:0,island:0,gear:0,days:[],playtime:0,transactions:[]};
+ return migrateItems({islandKills:Array(8).fill(0),islandGather:Array(8).fill(0),islandBosses:Array(8).fill(0),contracts:[],contractClaims:0,discovered:[],treasures:[],version:VERSION,trainer:1,xp:0,coins:250,bank:0,tickets:5,shards:0,ore:0,herbs:0,potions:4,pity:0,rolls:0,kills:0,bosses:0,gathered:0,waveBest:0,claimed:[],visited:[0],sigils:[],party:[createMon(id)],active:0,island:0,gear:0,days:[],playtime:0,transactions:[]});
 }
-export function stats(mon,gear=0){
+export function stats(mon,gear=0,bonus={}){
  const p=BY_ID.get(mon.id),s=mon.skills,t=TRAITS[mon.trait],l=mon.lv,iv=mon.iv;
  return {
- hp:Math.floor((65+p.s[0]*1.5+l*9+iv[0]+s.vitality*8)*t.hp),
- atk:Math.floor((12+p.s[1]*.42+l*2+iv[1]*.4+s.strength*3+gear*4+mon.rank*2)*t.atk),
- def:Math.floor((8+p.s[2]*.3+l+iv[2]*.3+s.guard*3+gear*2)*t.def),
- sp:Math.floor((12+p.s[3]*.42+l*2+iv[3]*.4+s.arcana*3+gear*4+mon.rank*2)*t.sp),
- sd:Math.floor((8+p.s[4]*.3+l+iv[4]*.3+s.guard*3+gear*2)*t.def),
- speed:Math.min(260,(135+p.s[5]*.35+s.haste*3)*t.spd),
- mana:60+l*2+s.arcana*4,
- crit:Math.min(.4,.06+iv[5]/600+s.haste*.005)
+ hp:(bonus.hp||0)+Math.floor((65+p.s[0]*1.5+l*9+iv[0]+s.vitality*8)*t.hp),
+ atk:(bonus.atk||0)+Math.floor((12+p.s[1]*.42+l*2+iv[1]*.4+s.strength*3+gear*4+mon.rank*2)*t.atk),
+ def:(bonus.def||0)+Math.floor((8+p.s[2]*.3+l+iv[2]*.3+s.guard*3+gear*2)*t.def),
+ sp:(bonus.sp||0)+Math.floor((12+p.s[3]*.42+l*2+iv[3]*.4+s.arcana*3+gear*4+mon.rank*2)*t.sp),
+ sd:(bonus.sd||0)+Math.floor((8+p.s[4]*.3+l+iv[4]*.3+s.guard*3+gear*2)*t.def),
+ speed:Math.min(300,(bonus.speed||0)+(135+p.s[5]*.35+s.haste*3)*t.spd),
+ mana:60+l*2+s.arcana*4+(bonus.mana||0),
+ crit:Math.min(.6,(bonus.crit||0)+.06+iv[5]/600+s.haste*.005)
  };
 }
 export function typeMultiplier(type,defenderTypes){return defenderTypes.reduce((m,t)=>m*(TYPES[type]?.[t]??1),1);}
@@ -111,11 +112,15 @@ export const QUESTS=[
  {id:'keeper',name:'Keeper of the tides',desc:'Defeat 7 different island guardians',goal:7,field:'sigils',tickets:20,coins:3000}
 ];
 export function questProgress(s,q){return Array.isArray(s[q.field])?s[q.field].length:s[q.field];}
-export function claimQuest(s,id){const q=QUESTS.find(q=>q.id===id);if(!q||s.claimed.includes(id)||questProgress(s,q)<q.goal)return false;s.claimed.push(id);s.tickets+=q.tickets;s.coins+=q.coins;return true;}
-export function daily(s,date=new Date().toISOString().slice(0,10)){if(s.days.includes(date))return false;s.days.push(date);s.days=s.days.slice(-60);s.tickets+=3;s.potions++;return true;}
+export function claimQuest(s,id){const q=QUESTS.find(q=>q.id===id);if(!q||s.claimed.includes(id)||questProgress(s,q)<q.goal)return false;s.claimed.push(id);s.tickets+=q.tickets;s.coins+=q.coins;awardXP(s,q.goal*25+100);return true;}
+export function daily(s,date=new Date().toISOString().slice(0,10)){if(s.days.includes(date))return false;s.days.push(date);s.equipmentTickets=(s.equipmentTickets||0)+1;s.days=s.days.slice(-60);s.tickets+=3;s.potions++;return true;}
 export function validateSave(raw){
  if(!raw||raw.version!==VERSION||!Array.isArray(raw.party)||!raw.party.length||raw.party.length>300)throw Error('This save is not compatible.');
  const s=structuredClone(raw);
+ validateItems(s);
+ for(const key of ['islandKills','islandGather','islandBosses']){s[key]??=Array(8).fill(0);if(!Array.isArray(s[key])||s[key].length!==8||s[key].some(n=>!Number.isSafeInteger(n)||n<0||n>1e9))throw Error('Invalid island progress.');}
+ s.contracts??=[];s.contractClaims??=0;s.discovered??=[];s.treasures??=[];
+ if(!Array.isArray(s.contracts)||s.contracts.length>3||s.contracts.some(c=>!/^([1-7])-(hunt|gather|boss)$/.test(c.id)||!Number.isSafeInteger(c.baseline)||c.baseline<0)||!Number.isSafeInteger(s.contractClaims)||s.contractClaims<0||!Array.isArray(s.discovered)||!Array.isArray(s.treasures)||s.discovered.length>21||s.treasures.length>21)throw Error('Invalid expedition records.');
  for(const key of ['trainer','xp','coins','bank','tickets','shards','ore','herbs','potions','pity','rolls','kills','bosses','gathered','waveBest','active','island','gear','playtime'])
  if(!Number.isFinite(s[key])||s[key]<0||s[key]>1e12)throw Error('Invalid save value: '+key);
  if(s.trainer<1||s.trainer>60||!Number.isInteger(s.island)||!ISLANDS[s.island]||s.active>=s.party.length||s.gear>10)throw Error('Invalid profile.');
@@ -124,5 +129,5 @@ export function validateSave(raw){
  if(!BY_ID.has(m.id)||typeof m.uid!=='string'||m.uid.length>100||!Number.isInteger(m.lv)||m.lv<1||m.lv>60||!Number.isFinite(m.xp)||m.xp<0||!Number.isInteger(m.trait)||!TRAITS[m.trait]||!Number.isInteger(m.points)||m.points<0||!Number.isInteger(m.rank)||m.rank<0||m.rank>5||!Array.isArray(m.iv)||m.iv.length!==6||m.iv.some(v=>!Number.isInteger(v)||v<0||v>31))throw Error('Invalid Pokémon record.');
  for(const k of SKILLS)if(!Number.isInteger(m.skills?.[k.key])||m.skills[k.key]<0||m.skills[k.key]>40)throw Error('Invalid skill.');
  }
- s.island=0;return s;
+ s.bestiaryClaims??=[];if(!Array.isArray(s.bestiaryClaims)||s.bestiaryClaims.length>21||s.bestiaryClaims.some(k=>!/^([1-7])-(5|20|60)$/.test(k)))throw Error('Invalid bestiary.');s.island=0;return s;
 }

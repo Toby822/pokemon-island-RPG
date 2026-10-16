@@ -16,9 +16,8 @@ jobs:
           node-version: '22'
       - name: Check JavaScript syntax
         run: |
-          node --check core.js
-          node --check world.js
-          node --check game.js
-          node --check coop.js
+          for file in *.js *.mjs; do
+            node --check "$file"
+          done
       - name: Test gameplay rules and economy
         run: npm test
