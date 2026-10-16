@@ -70,3 +70,12 @@ The official Hypixel wiki’s [Weapons](https://wiki.hypixel.net/Weapons), [Drag
 - [Hypixel Team — Foraging update](https://hypixel.net/threads/hypixel-skyblock-0-23-the-foraging-update.5921261/): reference for residents, regional activities, collections, perk progression and recipe unlocks. The seven three-chapter stories, dialogue, materials, rewards and collection bonuses here are original project content.
 - [Square Enix — Dragon Quest III HD-2D Remake](https://www.square-enix.com/asia/newsportal/en/topics/dragon-quest-iii-hd-2d/post02.html): reference for lighting, shading and environmental depth. This release remains a Canvas 2D renderer and uses original code-drawn wall/roof planes, cliff banks and furniture; it does not use Square Enix art or a 3D engine.
 - Buildings, elevated soil beds, district props and navigation illustrations were built from this project's original pixel painters. No additional third-party terrain textures were introduced.
+
+
+## Vaults & Vanguard (v1.6)
+
+- [Hypixel Team — September 21st Minister Update, Mob Level Improvements Testing 2](https://hypixel.net/threads/september-21st-minister-update-mob-level-improvements-testing-2.6150078/): primary reference for distinguishing ordinary mobs, minibosses and guardian-level reward/difficulty bands, and avoiding excessive early-game grind.
+- [Hypixel Team — SkyBlock Patch 0.8, The Catacombs](https://hypixel.net/threads/skyblock-patch-0-8-first-dungeon-the-catacombs.2851991/): reference for cooperative exploration, randomised encounter spaces, secrets and treasure. This release adds seeded scenery and optional field encounters, not a Catacombs dungeon implementation.
+- [Supergiant Games — Hades Blood Price Update](https://www.supergiantgames.com/blog/hades-dive-into-the-blood-price-update/): reference for iterative encounter and reward refinement.
+- Eight giant landmarks, revised tree forms, four chest material tiers, 26 equipment illustrations and navigation art are original project code-drawn artwork. No additional external game textures or gameplay source were incorporated.
+- Older Hypixel wiki references above record historical research; those pages may redirect following the official wiki closure. New research uses official Hypixel Team forum posts.

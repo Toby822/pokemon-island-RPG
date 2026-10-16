@@ -1,6 +1,6 @@
-import {TALENTS} from './talents.js?v=1.5.1';
-import {POKEMON_NAMES_ZH} from './names-zh.js?v=1.5.1';
-import {ZH_EXTRA} from './zh-catalog.js?v=1.5.1';
+import {TALENTS} from './talents.js?v=1.6.0';
+import {POKEMON_NAMES_ZH} from './names-zh.js?v=1.6.0';
+import {ZH_EXTRA} from './zh-catalog.js?v=1.6.0';
 export let language='en';
 export const ZH={
  'Tides of Aether':'以太紀行','Explore':'探索','Sanctuary':'寶可夢收藏','Equipment':'裝備背包','Equipment & Accessories':'裝備與飾品','Summon':'召喚','Island atlas':'世界地圖','Island Atlas':'世界地圖','Journal':'冒險日誌','Worlds':'多人世界','Field guide':'遊戲指南','Field Guide':'遊戲指南','Return to Haven':'返回主城','Your companions':'同行夥伴','View all ↗':'查看全部 ↗','Haven town directory':'主城設施導覽','Rangers Guild':'探險公會','Abilities':'能力培育','Talents':'天賦樹','Talent Tree':'天賦樹','Haven Bank':'主城銀行','Artisan’s Forge':'工匠鍛造坊',"Artisan's forge":'工匠鍛造坊','Boss Armory':'守護者武庫','Weapon Codex':'武器圖鑑','Backpack':'冒險背包','Inventory':'道具清單','NPC Dialogue':'寶可夢對話','Relic Emporium':'遺物抽獎屋','Provisioner Market':'補給市場','Island Bestiary':'地區生態圖鑑','Haven Town Directory':'主城導覽','Summon Shrine':'寶可夢召喚神殿','Expedition Supplies':'野外補給站','Rift Survival':'裂隙生存挑戰','Shared Worlds':'共享多人世界','Keep your story safe.':'設定與存檔','Aether Haven':'以太主城','Verdant Wilds':'翠綠樹海','Coral Coast':'珊瑚港灣','Cinder Crater':'熾焰城塞','Cinder Citadel':'熾焰城塞','Frostveil Reach':'霜幕要塞','Frostveil Keep':'霜幕要塞','Stormglass Peaks':'雷晶工業城','Stormglass Foundry':'雷晶工業城','Moonshade Hollow':'月影古城','Moonshade City':'月影古城','Astral Sanctuary':'星界王宮','Astral Palace':'星界王宮',

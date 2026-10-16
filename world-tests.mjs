@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import {World} from './world.js?v=1.5.1';
-import {newGame,ISLANDS,BY_ID,enemyRole} from './core.js?v=1.5.1';
-import {groundAt,walkableGround,TOWN_BUILDINGS,regionalBuildings,WORLD_SIZE} from './pixel-art.js?v=1.5.1';
+import {World} from './world.js?v=1.6.0';
+import {newGame,ISLANDS,BY_ID,enemyRole} from './core.js?v=1.6.0';
+import {groundAt,walkableGround,TOWN_BUILDINGS,regionalBuildings,WORLD_SIZE} from './pixel-art.js?v=1.6.0';
 const hooks={toast(){},sound(){},panel(){},changed(){},hud(){}};
 const make=()=>new World(null,newGame(),hooks,{headless:true});
 const w=make();w.p.x=900;w.p.y=790;w.p.hp=100;w.keys={d:true};w.update(.1);assert(w.p.x>900);assert.equal(w.p.dir,2);
@@ -10,7 +10,7 @@ assert.deepEqual(ISLANDS.map(i=>i.level),[1,1,8,16,25,35,46,58]);
 for(const map of ISLANDS){
  w.changeIsland(map.id,false);assert(!w.blocked(900,790),'Arrival square blocked: '+map.name);
  assert(w.nodes.every(n=>!w.blocked(n.x,n.y)),'Resource in blocked terrain: '+map.name);
- const copy=make();copy.changeIsland(map.id,false);assert.deepEqual(copy.nodes,w.nodes,'Host/client gather indices differ');
+ const copy=make();copy.s.worldSeed=w.s.worldSeed;copy.changeIsland(map.id,false);assert.deepEqual(copy.nodes,w.nodes,'Host/client gather indices differ');
  const houses=w.objects.filter(o=>o.action);
  // Flood-fill actual foot collisions on a 20-world-unit grid, stopping at every door.
  const step=20,queue=[[900,790]],seen=new Set(['900,790']),remaining=new Set(houses.map((_,i)=>i));let head=0;

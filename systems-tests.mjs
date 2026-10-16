@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import {newGame,validateSave,stats,xpNeeded,awardXP} from './core.js?v=1.5.1';
-import {ITEM_TIERS,GEAR_TYPES,createItem,equipItem,itemBonuses,rollEquipment,salvageItem,upgradeItem} from './items.js?v=1.5.1';
-import {combatReward,acceptContract,finishContract,contractProgress,discover,openTreasure} from './progression.js?v=1.5.1';
+import {newGame,validateSave,stats,xpNeeded,awardXP} from './core.js?v=1.6.0';
+import {ITEM_TIERS,GEAR_TYPES,createItem,equipItem,itemBonuses,rollEquipment,salvageItem,upgradeItem} from './items.js?v=1.6.0';
+import {combatReward,acceptContract,finishContract,contractProgress,discover,openTreasure} from './progression.js?v=1.6.0';
 const test=(name,fn)=>{fn();console.log('PASS '+name);};
 test('Six requested rarity names, colours and probabilities',()=>{assert.deepEqual(ITEM_TIERS.map(t=>t.name),['Common','Rare','Epic','Mythic','Legendary','Ultra']);assert.equal(ITEM_TIERS.reduce((s,t)=>s+t.chance,0),100);});
 test('Equipped weapons and armour increase actual combat stats',()=>{const s=newGame(),w=createItem('sabre',2,1,()=>.5),a=createItem('mail',1,0,()=>.5);s.trainer=5;s.inventory.push(w,a);equipItem(s,w.uid,'weapon');equipItem(s,a.uid,'chest');const base=stats(s.party[0]),up=stats(s.party[0],0,itemBonuses(s));assert(up.atk>base.atk);assert(up.hp>base.hp);assert(up.def>base.def);assert.throws(()=>equipItem(s,w.uid,'helmet'));});

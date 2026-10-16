@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {REGIONAL_STORIES,migrateExpeditions,validateExpeditions,startExpedition,noteExpeditionEvent,expeditionStatus,claimExpedition,expeditionBonuses,craftExpeditionRecipe} from './expeditions.js?v=1.5.1';
+import {REGIONAL_STORIES,migrateExpeditions,validateExpeditions,startExpedition,noteExpeditionEvent,expeditionStatus,claimExpedition,expeditionBonuses,craftExpeditionRecipe} from './expeditions.js?v=1.6.0';
 const test=(name,fn)=>{fn();console.log('PASS '+name);};
 const fixture=()=>migrateExpeditions({trainer:60,island:1,coins:10000,herbs:100,ore:100,shards:100,potions:0,tickets:0,equipmentTickets:0,bossVouchers:Array(8).fill(0),treasures:[]});
 function finishObjectives(s,region){const {chapter}=expeditionStatus(s,region);for(const objective of chapter.objectives){if(objective.kind==='explore'){for(const index of objective.sites)noteExpeditionEvent(s,{island:region,kind:'explore',index});}else if(objective.kind==='cache'){for(let index=0;index<objective.goal;index++)noteExpeditionEvent(s,{island:region,kind:'cache',index});}else for(let i=0;i<objective.goal;i++)noteExpeditionEvent(s,{island:region,kind:objective.kind});}}

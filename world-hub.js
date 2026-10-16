@@ -1,14 +1,15 @@
-import {WORLD_SIZE} from './pixel-art.js?v=1.5.1';
-import {stats} from './core.js?v=1.5.1';
-import {combatReward} from './progression.js?v=1.5.1';
+import {RESOURCE_REGROW,newWorldSeed,regionSeed} from './exploration.js?v=1.6.0';
+import {WORLD_SIZE} from './pixel-art.js?v=1.6.0';
+import {stats} from './core.js?v=1.6.0';
+import {combatReward} from './progression.js?v=1.6.0';
 export class WorldHub{
- constructor(coop){this.coop=coop;this.scenes=new Map();this.clients=new Map();this.elapsed=0;}
+ constructor(coop){this.coop=coop;this.scenes=new Map();this.clients=new Map();this.elapsed=0;this.worldSeed=newWorldSeed();}
  scene(id){
  if(this.scenes.has(id))return this.scenes.get(id);
- const scene=this.coop.w.createScene(id);
+ const scene=this.coop.w.createScene(id);scene.applyLayoutSeed?.(regionSeed(this.worldSeed,id));scene.cacheClaims=new Map();
  scene.net={role:'simulation',tick(){},sendTo:(uid,msg)=>this.emit(uid,msg),broadcast:msg=>{for(const uid of Object.keys(scene.remotes))this.emit(uid,msg);}};
  scene.reward=enemy=>{
- const reward={...combatReward(id,enemy.level,enemy.boss),type:'reward',tickets:enemy.boss?3:0,boss:enemy.boss,island:id,x:enemy.x,y:enemy.y};
+ const reward={...combatReward(id,enemy.level,enemy.boss,enemy.eliteRank),type:'reward',tickets:enemy.boss?3:0,boss:enemy.boss,eliteRank:enemy.eliteRank,sentinelSlot:enemy.sentinelSlot,island:id,x:enemy.x,y:enemy.y};
  for(const [uid,a] of Object.entries(scene.remotes))if(a.hp>0&&Math.hypot(a.x-enemy.x,a.y-enemy.y)<850)this.emit(uid,reward);
  scene.fx(enemy.x,enemy.y,'#d8e9ad',6);
  };
@@ -31,15 +32,17 @@ export class WorldHub{
  if(kind==='burst')scene.cast(2,actor,actor);
  if(kind==='potion')actor.mp=Math.min(actor.st.mana,actor.mp+actor.st.mana*.5);
  if(kind==='boss'||kind==='rift'){if((actor.challengeAfter||0)>scene.time)return;actor.challengeAfter=scene.time+5;if(kind==='boss')scene.startBoss();else scene.startRift();}
+ if(kind==='sentinel'){if((actor.challengeAfter||0)>scene.time)return;actor.challengeAfter=scene.time+3;const altar=scene.objects?.find(o=>o.action==='sentinel'&&o.slot===index);if(altar&&Math.hypot(altar.x-actor.x,altar.y-actor.y)<125)scene.startSentinel(index);return;}
+ if(kind==='cache'){const box=scene.objects?.find(o=>o.action==='treasure'&&o.cache===index);if(!Number.isInteger(index)||!box||Math.hypot(box.x-actor.x,box.y-actor.y)>110)return;let claims=scene.cacheClaims.get(uid);if(!claims){claims=new Set();scene.cacheClaims.set(uid,claims);}if(claims.has(index))return;claims.add(index);this.emit(uid,{type:'cacheReward',island:state.island,index,tier:box.tier});return;}
  if(kind==='gather'){
  const node=scene.nodes[index];if(!Number.isInteger(index)||!node||node.ready>0||Math.hypot(node.x-actor.x,node.y-actor.y)>100)return;
- node.ready=55;this.emit(uid,{type:'gatherReward',island:state.island,kind:node.kind,amount:1+Math.floor(Math.random()*2),xp:8+state.island*4});
+ node.ready=RESOURCE_REGROW;this.emit(uid,{type:'gatherReward',island:state.island,kind:node.kind,amount:1+Math.floor(Math.random()*2),xp:8+state.island*4});
  }
  }
  emit(uid,msg){if(uid===this.coop.peer?.id)this.coop.handleHostMessage(msg);else this.coop.sendTo(uid,msg);}
  snapshot(scene){
  const players={};for(const [uid,a] of Object.entries(scene.remotes))players[uid]={...a,actionElapsed:Math.max(0,scene.time-(a.actionStart||0)),actionUntil:Math.max(0,(a.actionUntil||0)-scene.time)};
- return {type:'snapshot',island:scene.id,clock:scene.time,mode:scene.mode,wave:scene.wave,enemies:scene.enemies,bullets:scene.bullets,hazards:scene.hazards,riftTime:scene.riftTime,nodes:scene.nodes.map(n=>Math.round(n.ready*10)/10),players,populations:Array.from({length:8},(_,id)=>[...this.clients.values()].filter(a=>a.island===id).length)};
+ return {type:'snapshot',island:scene.id,layoutSeed:scene.layoutSeed,clock:scene.time,mode:scene.mode,wave:scene.wave,enemies:scene.enemies,bullets:scene.bullets,hazards:scene.hazards,riftTime:scene.riftTime,nodes:scene.nodes.map(n=>Math.round(n.ready*10)/10),players,populations:Array.from({length:8},(_,id)=>[...this.clients.values()].filter(a=>a.island===id).length)};
  }
  tick(dt){
  for(const scene of this.scenes.values())if(Object.keys(scene.remotes).length)scene.update(dt);

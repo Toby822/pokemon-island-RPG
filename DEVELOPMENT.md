@@ -1,29 +1,37 @@
-# Development checkpoint — Living Frontiers 1.5
+# Development checkpoint — Vaults & Vanguard 1.6
 
-## Delivered in this iteration
+## Current milestone
 
-- HUD localisation before DOM writes; incremental before-paint translation; select values and modal state preserved.
-- Accessible minimap button and atlas shortcut from a focused language selector.
-- Rift transitions clean up expired effects; active shared runs cannot be reset; protected boss phase cut-ins.
-- 4800×3400 terrain with three outer districts per region, original projected pixel faces, shore banks, raised soil beds and dimensional furniture.
-- Current-region atlas with destination tracking.
-- Seven regional stories, twenty-one chapters, fourteen additional residents, seven collectible emblems and seven functional camp recipes.
-- Spatial collision indexing, distant-object culling and encounter redistribution around explorers.
+Eight region-specific giant landmarks and revised biome trees; 26 original detailed equipment illustrations; four chest tiers with exact 55/30/13/2 generation weights; opening/fade and permanent personal claims; saved solo and shared host layout seeds; a dedicated current-region map with layers, distance tracking and edge arrows; two lieutenants and one captain per combat island.
+
+Resource density is 42–54 rather than 100+ nodes, with 90-second regeneration and persistent solo timestamps. Later ordinary HP rises 8%; guardian HP rises 28%, damage scales modestly by region, and contact attacks have their own cooldown. Optional elite victories provide stronger rewards and one-time trophies. These values are initial tuning, not a claim of universal balance.
+
+## Critical review and fixes
+
+- Claimed chests no longer remain solid/actionable or appear on the map. Personal claim IDs survive layout changes.
+- Seed transitions relocate obstructed players and discard stale destination coordinates. Leaving co-op restores solo geometry and resource identities without free healing.
+- Random scenery reserves residents and doors before placement. Resources and treasure use flood-reachable positions; ordinary spawn attempts retain player spacing even after exhausting retries.
+- Sentinel altars are separated from service/NPC interactions and resource nodes. Both the altar and its actual spawn position are checked for collision. Tests use the normal F interaction, not only the direct summon method.
+- Revisit resource resets, same-region healing, unsafe instant travel, Rift encounter resets and guardian melee starvation were addressed.
+- Giant landmark render caches include the entire tall silhouette; generated scene assets are regenerated from the same original painters.
 
 ## Verification
 
-Automated rules include full species data, stat formulas, economy/pity, old saves, ability/talent limits, region travel and reachable service/district/NPC geometry; all chapter sequences and resource-paid recipe claims; duplicate-Rift protection; collision-index equivalence; in-memory multi-island protocol and hazard/death clocks. UI DOM regression checks prove unchanged translated labels do not generate writes and filter option values remain stable. A mocked application startup/render test exercises the menus and a complete first chapter through actual event handlers.
+The rule/protocol suite covers species, stats, economy, pity, save migration and corruption, talents, chapters/recipes, seeded geometry, one-time chest claims and odds, resource persistence, all optional encounters, host layout authority and personal reward routing. Application mocks exercise startup/reset, all eight regional render paths, menus, NPC gifts and guardian phase hazards. Original SVG assets are XML checked and visually reviewed as contact sheets.
 
-Actual browser layout and cross-network WebRTC are still unverified. The existing browser access preference blocks this site's inspection. Do not claim the automated checks are a browser playtest.
+Actual browser layout and cross-network WebRTC remain unverified because this site's browser inspection is blocked by the existing browser access preference. Application mocks and in-memory signalling do not establish a real browser/network playtest.
 
-## Next review priorities
+## Continuing review
 
-1. Real browser text/layout and two-device network playtest when the surface is available.
-2. More varied active abilities with explicit Mana/cooldown/loadout rules; this iteration does not add new attack movesets.
-3. Distinct dungeon/harbour/forest route geometry and interactive local activities beyond hunt, gather and discovery.
-4. Guardian movement mechanics and encounter timing measured with representative builds, not only maximum damage bounds.
-5. Item art and equipped-weapon attack visuals; current weapons are stat profiles.
+An hourly development task is enabled to inspect current main, research primary game-design sources, critique the current game and implement one bounded tested improvement per run. It avoids overlapping recent development commits and uses an expected-head lease when publishing.
+
+Priorities:
+
+1. Representative-build encounter timing, elite movement and reward pacing, including a new player's first hour.
+2. Distinct route geometry and interactive regional activities beyond hunts, gathering and discovery.
+3. Active ability loadouts with explicit Mana/cooldown rules; equipment remains stat profiles rather than separate weapon movesets.
+4. Actual browser text/layout and two-device WebRTC playtests when the surface is available.
 
 ## Release discipline
 
-Keep old-save migration, one-time reward accounting, clear displayed odds and cross-island isolation covered. Add a regression for observed faults. Native Pokémon sprites depend on upstream coverage and have a generic fallback. Public sessions are browser-hosted, up to eight explorers; they require an online host and do not create a durable MMO backend.
+Preserve old saves, permanent reward accounting, displayed odds and cross-island isolation. Add regression coverage for observed faults. Native Pokémon animation depends on upstream coverage and retains fallback art. Public sessions are browser-hosted, up to eight explorers; they require an online host and do not provide a durable MMO backend. Never describe ongoing development as a bug-free or finished large-scale game.

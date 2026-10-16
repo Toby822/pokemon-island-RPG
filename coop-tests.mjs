@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {EventEmitter} from 'node:events';
-import {Coop} from './coop.js?v=1.5.1';
-import {newGame,stats} from './core.js?v=1.5.1';
+import {Coop} from './coop.js?v=1.6.0';
+import {newGame,stats} from './core.js?v=1.6.0';
 const registry=new Map();
 class Connection extends EventEmitter{
  constructor(peer){super();this.peer=peer;this.open=false;}
@@ -32,7 +32,7 @@ b.action('attack');assert.equal(a.hub.scene(1).attacks,1);assert.equal(a.hub.sce
 const guestActor=a.hub.scene(1).remotes[b.peer.id];guestActor.mp=0;b.action('potion');assert.equal(guestActor.mp,guestActor.st.mana*.5);
 const money=wb.s.coins,hostMoney=wa.s.coins;a.hub.scene(1).reward({x:900,y:790,level:1,boss:false});assert(wb.s.coins>money);assert.equal(wa.s.coins,hostMoney);
 wa.changeIsland(1);a.tick(.2);b.tick(.2);await flush();
-b.action('gather',0);assert(wb.s.herbs>0);a.action('gather',0);assert.equal(wa.s.herbs,0);assert.equal(a.hub.scene(1).nodes[0].ready,55);
+b.action('gather',0);assert(wb.s.herbs>0);a.action('gather',0);assert.equal(wa.s.herbs,0);assert.equal(a.hub.scene(1).nodes[0].ready,90);
 assert.equal(a.hub.clients.get(a.peer.id).island,1);
 wa.p.action='Attack';wa.p.actionStart=0;wa.p.actionUntil=.45;wa.time=.2;a.tick(.2);await flush();
 assert.equal(Object.values(wb.remotes)[0].action,'Attack');

@@ -8,6 +8,17 @@ export const BOSS_PROFILES={
  384:{title:'Sentinel Beyond the Stars',zh:'群星彼端的哨兵',color:'#cde8a3',skills:[{name:'Skybreaker',zh:'破空之擊',pattern:'lane'},{name:'Astral Comets',zh:'星界隕星',pattern:'scatter'}]},
  493:{title:'The Judgment of Arceus',zh:'阿爾宙斯的裁決',color:'#ffe9aa',skills:[{name:'Judgment Ring',zh:'裁決之環',pattern:'ring'},{name:'Celestial Cross',zh:'天界十字',pattern:'cross'},{name:'Falling Stars',zh:'群星墜落',pattern:'scatter'}]}
 };
+// Optional field encounters use slower, readable pattern combinations.
+const FIELD_PROFILES=[
+ [123,'Briar Blade','荊棘之刃','lane','scatter'],[127,'Rootbreaker Captain','斷根隊長','cross','ring'],
+ [9,'Harbour Bulwark','港灣壁壘','lane','ring'],[230,'Pearlguard Captain','珍珠衛隊長','scatter','cross'],
+ [112,'Obsidian Ram','黑曜衝角','lane','scatter'],[467,'Furnace Captain','熔爐隊長','fan','ring'],
+ [362,'Whiteout Watch','白霧巡衛','ring','scatter'],[461,'Glacier Captain','冰川隊長','cross','lane'],
+ [125,'Relay Striker','中繼突擊者','cross','scatter'],[466,'Stormcoil Captain','雷晶隊長','lane','ring'],
+ [359,'Moonlit Omen','月夜預兆','lane','scatter'],[442,'Moonveil Captain','月幕隊長','ring','cross'],
+ [373,'Astral Talon','星界利爪','fan','scatter'],[376,'Vanguard Captain','先鋒隊長','cross','ring']
+];
+for(const [id,title,zh,a,b] of FIELD_PROFILES)BOSS_PROFILES[id]={title,zh,color:'#c5ade4',skills:[{name:'Marked Strike',zh:'標記打擊',pattern:a},{name:'Warden Pattern',zh:'守衛陣式',pattern:b}]};
 export function makeHazards(enemy,target,skill,phase=0){const common={delay:1.45,life:.4,age:0,color:BOSS_PROFILES[enemy.id]?.color||'#ffbc94',power:enemy.atk*(phase?1.6:1.35),source:enemy.uid,name:skill.name,zh:skill.zh},a=Math.atan2(target.y-enemy.y,target.x-enemy.x),out=[];
  const circle=(x,y,r)=>out.push({...common,kind:'circle',x,y,r});
  const lane=(x,y,angle,length,width)=>out.push({...common,kind:'line',x,y,x2:x+Math.cos(angle)*length,y2:y+Math.sin(angle)*length,width});

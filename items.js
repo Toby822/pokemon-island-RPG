@@ -1,6 +1,7 @@
-import {migrateExpeditions,expeditionBonuses} from './expeditions.js?v=1.5.1';
-import {talentBonuses,migrateAdventure} from './talents.js?v=1.5.1';
-import {RELIC_WEAPONS} from './relic-weapons.js?v=1.5.1';
+import {equipmentArt} from './equipment-art.js?v=1.6.0';
+import {migrateExpeditions,expeditionBonuses} from './expeditions.js?v=1.6.0';
+import {talentBonuses,migrateAdventure} from './talents.js?v=1.6.0';
+import {RELIC_WEAPONS} from './relic-weapons.js?v=1.6.0';
 export const ITEM_TIERS=[
  {name:'Common',color:'#a5aab3',chance:60,power:1},
  {name:'Rare',color:'#65a7ff',chance:25,power:1.35},
@@ -84,7 +85,4 @@ export function validateItems(s){
  for(const key of SLOTS){const id=s.equipment[key];if(id!==null&&!ids.has(id))throw Error('Invalid equipped item.');if(id){const t=ITEM_BY_ID.get(s.inventory.find(i=>i.uid===id).template);if(t.slot!==key&&!(t.slot==='accessory'&&key.startsWith('accessory')))throw Error('Invalid slot.');}}
  const equipped=Object.values(s.equipment).filter(Boolean);if(new Set(equipped).size!==equipped.length)throw Error('An item cannot fill two slots.');
 }
-export function gearIcon(icon,color='#d7c28c'){
- const paths={scythe:'M5 29 19 7 29 4 29 10 22 12 19 6 9 3 2 9 11 5 17 9',staff:'M13 29 13 11 6 7 10 1 20 1 25 7 18 12 18 29Z M11 5 15 9 20 5',spear:'M13 30 13 13 6 9 11 1 12 8 15 10 19 8 20 1 26 9 18 14 18 30Z',bow:'M7 2 21 5 27 15 22 27 7 30 17 24 20 16 17 8Z M7 2 7 30 9 30 9 2Z',hammer:'M11 29 13 14 4 13 3 3 26 3 27 14 18 15 16 29Z',axe:'M13 30 13 3 18 3 18 7 27 8 30 17 22 19 18 14 18 30Z M12 7 4 8 2 17 10 19 13 14',tome:'M4 5 25 3 29 26 7 29Z M9 8 23 6 25 22 11 25Z M13 11 20 10 21 18 14 19Z',dagger:'M3 28 13 15 12 4 17 1 18 11 27 4 29 8 21 19 9 22 7 30Z',blade:'M7 25 22 10 24 3 17 5 4 20 7 23 3 27 5 29 9 25 M4 17 13 26',wand:'M6 27 21 10 M18 3 24 3 28 8 24 13 18 13 14 8Z',claw:'M6 24 11 8 14 22 18 5 20 21 25 9 24 26 13 29Z',helm:'M5 23 5 13 10 5 22 5 27 13 27 23 21 23 21 16 11 16 11 23Z',armour:'M4 9 10 5 13 10 19 10 22 5 28 9 25 16 22 14 22 28 10 28 10 14 7 16Z',boots:'M7 4 16 4 16 19 24 22 25 28 6 28 6 20Z',ring:'M8 9 12 5 20 5 24 9 24 23 20 27 12 27 8 23Z M12 12 12 20 20 20 20 12Z',amulet:'M8 3 9 12 16 15 23 12 24 3 M16 14 25 21 16 30 7 21Z',feather:'M5 28 22 5 29 3 28 12 20 23 11 25 M12 20 20 20 M17 13 25 13'};
- return '<svg class="gear-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="'+(paths[icon]||paths.amulet)+'" fill="'+color+'" fill-rule="evenodd" stroke="#283a31" stroke-width="1.5" stroke-linejoin="miter"/></svg>';
-}
+export function gearIcon(icon,color='#d7c28c',variant=''){return equipmentArt(icon,color,variant);}

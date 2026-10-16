@@ -1,7 +1,7 @@
-import {REGIONAL_STORIES,migrateExpeditions,expeditionStatus,startExpedition,claimExpedition,craftExpeditionRecipe,expeditionBonuses} from './expeditions.js?v=1.5.1';
-import {awardXP,ISLANDS} from './core.js?v=1.5.1';
-import {sceneArt,pixelIcon} from './ui-art.js?v=1.5.1';
-import {t,translateText} from './i18n.js?v=1.5.1';
+import {REGIONAL_STORIES,migrateExpeditions,expeditionStatus,startExpedition,claimExpedition,craftExpeditionRecipe,expeditionBonuses} from './expeditions.js?v=1.6.0';
+import {awardXP,ISLANDS} from './core.js?v=1.6.0';
+import {sceneArt,pixelIcon} from './ui-art.js?v=1.6.0';
+import {t,translateText} from './i18n.js?v=1.6.0';
 export function installExpeditions(api){
  const {state,world,modal,changed,toast,esc}=api;let selected=world.id||1,lastRegion=world.id;
  const resource=key=>({coins:t('coins','金幣'),herbs:t('herbs','藥草'),ore:t('ore','礦石'),shards:t('stardust','星塵'),potions:t('potions','藥水'),tickets:t('summon tickets','召喚券'),equipmentTickets:t('equipment vouchers','裝備券'),bossVouchers:t('regional guardian seals','當區守護者印記')})[key]||key;

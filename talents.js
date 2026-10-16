@@ -1,3 +1,4 @@
+import {migrateExploration} from './exploration.js?v=1.6.0';
 export const TALENTS=[
  {id:'stride',branch:'Wind',name:'Fleet Foot',zh:'疾風步',desc:'+3 movement speed per rank',descZh:'每級移動速度 +3',key:'speed',value:3,level:3},
  {id:'focus',branch:'Wind',name:'Quick Focus',zh:'迅捷專注',desc:'Skills recover 2% faster per rank',descZh:'每級技能冷卻縮短 2%',key:'cdr',value:.02,level:9,parent:'stride'},
@@ -15,7 +16,7 @@ export const TALENTS=[
  {id:'overcharge',branch:'Arcana',name:'Overcharge',zh:'超載迴路',desc:'+6 Attack and Sp. Attack per rank',descZh:'每級物攻與特攻 +6',key:'power',value:6,level:27,parent:'scholar'},
  {id:'sage',branch:'Arcana',name:'Sage Heart',zh:'賢者之心',desc:'+8 maximum Mana per rank',descZh:'每級魔力上限 +8',key:'mana',value:8,level:39,parent:'overcharge'}
 ];
-export function migrateAdventure(s){s.talents??={};s.bossVouchers??=Array(8).fill(0);s.bossPity??=Array(8).fill(0);s.bossUltraPity??=Array(8).fill(0);s.npcGifts??=[];return s;}
+export function migrateAdventure(s){migrateExploration(s);s.talents??={};s.bossVouchers??=Array(8).fill(0);s.bossPity??=Array(8).fill(0);s.bossUltraPity??=Array(8).fill(0);s.npcGifts??=[];return s;}
 export function talentBudget(s){return Math.floor((s.trainer-1)/2);}
 export function talentSpent(s){return Object.values(s.talents||{}).reduce((a,b)=>a+b,0);}
 export function learnTalent(s,id){migrateAdventure(s);const node=TALENTS.find(n=>n.id===id);if(!node||s.trainer<node.level||(s.talents[id]||0)>=3||(node.parent&&(s.talents[node.parent]||0)<2)||talentSpent(s)>=talentBudget(s))throw Error('Talent unavailable. Check level, parent ranks and points.');s.talents[id]=(s.talents[id]||0)+1;return node;}

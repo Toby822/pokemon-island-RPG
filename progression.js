@@ -1,11 +1,12 @@
-import {awardXP,ISLANDS} from './core.js?v=1.5.1';
+import {cacheRewards} from './exploration.js?v=1.6.0';
+import {awardXP,ISLANDS} from './core.js?v=1.6.0';
 export const LANDMARKS=[
  {name:'Ranger Outpost',x:1660,y:800,desc:'A trading camp on the edge of the old road.'},
  {name:'Ancient Observatory',x:2200,y:1080,desc:'Watch the sky, then look a little closer.'},
  {name:'Forgotten Gardens',x:1900,y:1570,desc:'There is life here, even after all these years.'}
 ];
 export function migrateProgress(s){s.islandKills??=Array(8).fill(0);s.islandGather??=Array(8).fill(0);s.islandBosses??=Array(8).fill(0);s.contracts??=[];s.contractClaims??=0;s.discovered??=[];s.treasures??=[];}
-export function combatReward(island,level,boss=false){return {coins:Math.floor((8+level*3)*(1+island*.15)*(boss?12:1)),xp:Math.floor((18+level*7)*(1+island*.35)*(boss?8:1))};}
+export function combatReward(island,level,boss=false,eliteRank=0){return {coins:Math.floor((8+level*3)*(1+island*.15)*(boss?12:eliteRank===2?3:eliteRank===1?1.8:1)),xp:Math.floor((18+level*7)*(1+island*.35)*(boss?8:eliteRank===2?3.5:eliteRank===1?2.1:1))};}
 export function contractList(island){
  if(island<1||island>7)return [];
  return [
@@ -31,8 +32,8 @@ export function discover(s,island,index){
  migrateProgress(s);if(island<1||!LANDMARKS[index])return 0;const key=island+'-'+index;if(s.discovered.includes(key))return 0;
  s.discovered.push(key);const xp=80+island*island*35;awardXP(s,xp);return xp;
 }
-export function openTreasure(s,island,index){
+export function openTreasure(s,island,index,tier=0){
  migrateProgress(s);const key=island+'-'+index;if(!Number.isInteger(island)||island<1||island>7||!Number.isInteger(index)||index<0||index>2)throw Error('Invalid cache.');
  if(s.treasures.includes(key))throw Error('You already claimed this expedition cache.');
- s.treasures.push(key);s.equipmentTickets++;s.shards+=3+island;s.coins+=50+island*40;return key;
+ const reward=cacheRewards(island,tier);for(const field of ['coins','shards','equipmentTickets'])if(!Number.isSafeInteger(s[field])||s[field]+reward[field]>1e9)throw Error('Cannot carry the treasure rewards.');if(reward.bossVouchers&&(!Array.isArray(s.bossVouchers)||s.bossVouchers[island]+reward.bossVouchers>1e9))throw Error('Cannot carry the guardian seal.');s.treasures.push(key);s.equipmentTickets+=reward.equipmentTickets;s.shards+=reward.shards;s.coins+=reward.coins;if(reward.bossVouchers)s.bossVouchers[island]+=reward.bossVouchers;return key;
 }

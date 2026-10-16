@@ -1,10 +1,11 @@
-import {noteExpeditionEvent} from './expeditions.js?v=1.5.1';
-import {WORLD_SIZE} from './pixel-art.js?v=1.5.1';
-import {WorldHub} from './world-hub.js?v=1.5.1';
-import {itemBonuses} from './items.js?v=1.5.1';
-import {awardXP} from './core.js?v=1.5.1';
-import {BY_ID,stats,clamp} from './core.js?v=1.5.1';
-const PREFIX='tides-aether-v5-';
+import {RESOURCE_REGROW,validLayoutSeed} from './exploration.js?v=1.6.0';
+import {noteExpeditionEvent} from './expeditions.js?v=1.6.0';
+import {WORLD_SIZE} from './pixel-art.js?v=1.6.0';
+import {WorldHub} from './world-hub.js?v=1.6.0';
+import {itemBonuses} from './items.js?v=1.6.0';
+import {awardXP} from './core.js?v=1.6.0';
+import {BY_ID,stats,clamp} from './core.js?v=1.6.0';
+const PREFIX='tides-aether-v6-';
 export class Coop{
  constructor(world,changed,toast){this.w=world;this.changed=changed;this.toast=toast;this.role='solo';this.peer=null;this.connections=new Map();this.host=null;this.code='';this.status='Solo adventure';this.elapsed=0;this.timeout=null;this.name='Explorer';this.maxPlayers=4;this.realm=null;this.hub=null;this.populations=Array(8).fill(0);world.net=this;}
  async boot(fixedCode=null){
@@ -64,14 +65,15 @@ export class Coop{
  if(msg.type==='welcome'){this.toast('Connected. Every explorer can choose their own island.','good');this.changed();return;}
  if(msg.type==='snapshot'){
  if(msg.island!==this.w.id||!Array.isArray(msg.enemies)||msg.enemies.length>50)return;
- this.w.mode=msg.mode==='rift'?'rift':'explore';this.w.wave=clamp(msg.wave||0,0,10000);
+ if(validLayoutSeed(msg.layoutSeed))this.w.applyLayoutSeed?.(msg.layoutSeed);this.w.mode=msg.mode==='rift'?'rift':'explore';this.w.wave=clamp(msg.wave||0,0,10000);
  this.w.enemies=msg.enemies.filter(e=>BY_ID.has(e.id)&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&Number.isFinite(e.hp)&&Number.isFinite(e.max)&&e.max>0).map(e=>({...e,actionStart:this.w.time-((msg.clock||0)-(e.actionStart||0)),actionUntil:this.w.time+((e.actionUntil||0)-(msg.clock||0)),x:clamp(e.x,0,WORLD_SIZE.w),y:clamp(e.y,0,WORLD_SIZE.h)}));
  this.w.hazards=Array.isArray(msg.hazards)?msg.hazards.slice(0,80).filter(h=>['circle','line','ring'].includes(h.kind)&&Number.isFinite(h.x)&&Number.isFinite(h.y)&&Number.isFinite(h.age)&&Number.isFinite(h.delay)).map(h=>({...h})):[];this.w.riftTime=Number.isFinite(msg.riftTime)?msg.riftTime:0;
  this.w.bullets=Array.isArray(msg.bullets)?msg.bullets.slice(0,200).filter(b=>Number.isFinite(b.x)&&Number.isFinite(b.y)):[];
- if(Array.isArray(msg.nodes))msg.nodes.forEach((ready,i)=>{if(this.w.nodes[i]&&Number.isFinite(ready))this.w.nodes[i].ready=clamp(ready,0,55);});
+ if(Array.isArray(msg.nodes))msg.nodes.forEach((ready,i)=>{if(this.w.nodes[i]&&Number.isFinite(ready))this.w.nodes[i].ready=clamp(ready,0,RESOURCE_REGROW);});
  this.w.remotes={};for(const [id,a] of Object.entries(msg.players||{})){if(id===this.peer?.id||!validPlayer(a))continue;this.w.remotes[id]={...a,actionStart:this.w.time-Math.min(1,a.actionElapsed||0),actionUntil:this.w.time+Math.min(.6,a.actionUntil||0),st:stats(a.mon,a.gear||0,a.bonuses||{}),deathStart:this.w.time-Math.min(2,a.deathElapsed||0),name:cleanName(a.name)};}
  if(Array.isArray(msg.populations)&&msg.populations.length===8)this.populations=msg.populations;return;
  }
+ if(msg.type==='cacheReward'&&msg.island===this.w.id&&Number.isInteger(msg.index)&&msg.index>=0&&msg.index<3&&Number.isInteger(msg.tier)&&msg.tier>=0&&msg.tier<4){this.w.claimCache?.(msg.index,msg.tier);return;}
  if(msg.type==='reward'&&Number.isFinite(msg.coins)&&msg.coins>=0&&msg.coins<100000&&Number.isFinite(msg.xp)&&msg.xp>=0&&msg.xp<100000&&[0,1,3].includes(msg.tickets)&&Number.isInteger(msg.island)&&msg.island>0&&msg.island<8)this.w.grant(msg);
  if(msg.type==='gatherReward'&&['herb','ore'].includes(msg.kind)&&[1,2].includes(msg.amount)&&Number.isInteger(msg.island)&&msg.island>0&&msg.island<8){this.w.s[msg.kind==='herb'?'herbs':'ore']+=msg.amount;this.w.s.gathered++;this.w.s.islandGather[msg.island]++;noteExpeditionEvent(this.w.s,{kind:'gather',island:msg.island});awardXP(this.w.s,8+msg.island*4);this.w.h.changed();this.toast('Gathered '+msg.amount+' '+msg.kind+' · +'+(8+msg.island*4)+' XP');}
  if(msg.type==='waveReward'&&Number.isInteger(msg.wave)&&msg.wave>0&&msg.wave<10000&&[1,3].includes(msg.tickets)){this.w.s.waveBest=Math.max(this.w.s.waveBest,msg.wave);this.w.s.tickets+=msg.tickets;this.w.s.coins+=40*msg.wave;this.w.h.changed();this.toast('Island cleared wave '+msg.wave+'! +'+msg.tickets+' tickets.','good');}
@@ -91,7 +93,7 @@ export class Coop{
  sendTo(id,msg){const c=this.connections.get(id);if(c?.open)c.send(msg);}
  broadcast(msg){for(const c of this.connections.values())if(c.open)c.send(msg);}
  leave(notify=true){
- clearTimeout(this.timeout);for(const c of this.connections.values())c.removeAllListeners();this.peer?.destroy();this.peer=null;this.host=null;this.connections.clear();this.w.remotes={};this.hub=null;this.populations=Array(8).fill(0);this.role='solo';this.code='';this.realm=null;this.maxPlayers=4;this.status='Solo adventure';if(notify){this.changed();this.toast('Returned to solo adventure.');}
+ clearTimeout(this.timeout);for(const c of this.connections.values())c.removeAllListeners();this.peer?.destroy();this.peer=null;this.host=null;this.connections.clear();this.w.remotes={};this.hub=null;this.populations=Array(8).fill(0);this.role='solo';this.code='';this.realm=null;this.maxPlayers=4;this.status='Solo adventure';this.w.restoreSoloLayout?.();if(notify){this.changed();this.toast('Returned to solo adventure.');}
  }
 }
 function cleanName(s){return String(s||'Explorer').replace(/[<>&"'\x60]/g,'').slice(0,18)||'Explorer';}

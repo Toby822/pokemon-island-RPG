@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {installI18n,setLanguage,setLocalizedText,translateText,isAtlasShortcut} from './i18n.js?v=1.5.1';
+import {installI18n,setLanguage,setLocalizedText,translateText,isAtlasShortcut} from './i18n.js?v=1.6.0';
 // A small DOM with observable text mutations. This checks the translation
 // lifecycle (including before-paint delivery), rather than a screenshot mock.
 const microtasks=[],observers=[],events=new Map();let writes=0,walks=0;

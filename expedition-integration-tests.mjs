@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import {World} from './world.js?v=1.5.1';
-import {newGame,validateSave} from './core.js?v=1.5.1';
-import {WORLD_SIZE,REGION_SITES,walkableGround} from './pixel-art.js?v=1.5.1';
-import {startExpedition,noteExpeditionEvent,claimExpedition,expeditionStatus} from './expeditions.js?v=1.5.1';
-import {itemBonuses} from './items.js?v=1.5.1';
-import {mapDestinations,regionMapHTML} from './navigation.js?v=1.5.1';
+import {World} from './world.js?v=1.6.0';
+import {newGame,validateSave} from './core.js?v=1.6.0';
+import {WORLD_SIZE,REGION_SITES,walkableGround} from './pixel-art.js?v=1.6.0';
+import {startExpedition,noteExpeditionEvent,claimExpedition,expeditionStatus} from './expeditions.js?v=1.6.0';
+import {itemBonuses} from './items.js?v=1.6.0';
+import {mapDestinations,regionMapHTML} from './navigation.js?v=1.6.0';
 const test=(name,fn)=>{fn();console.log('PASS '+name);};
 const create=()=>new World(null,newGame(),{toast(){},sound(){},panel(){},changed(){},hud(){}},{headless:true});
 test('Rift transitions clear expired effects but repeated requests preserve an active shared run',()=>{const w=create();w.changeIsland(1,false);w.enemies=[];w.hazards=[{age:0}];w.corpses=[{life:1}];w.cinematic={left:1};w.startRift();assert.equal(w.mode,'rift');assert.equal(w.hazards.length,0);assert.equal(w.corpses.length,0);assert.equal(w.cinematic,null);w.wave=6;w.riftTime=1700;w.enemies=[{id:25,hp:1}];w.hazards=[{age:.4}];w.startRift();assert.equal(w.wave,6);assert.equal(w.riftTime,1700);assert.equal(w.enemies.length,1);assert.equal(w.hazards.length,1);});

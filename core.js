@@ -1,7 +1,8 @@
-import {validateExpeditions} from './expeditions.js?v=1.5.1';
-import {validateAdventure} from './talents.js?v=1.5.1';
-import {migrateItems,validateItems} from './items.js?v=1.5.1';
-import { DEX, TYPES, EVOLUTION } from './data.js?v=1.5.1';
+import {validateExploration} from './exploration.js?v=1.6.0';
+import {validateExpeditions} from './expeditions.js?v=1.6.0';
+import {validateAdventure} from './talents.js?v=1.6.0';
+import {migrateItems,validateItems} from './items.js?v=1.6.0';
+import { DEX, TYPES, EVOLUTION } from './data.js?v=1.6.0';
 export { DEX };
 export const VERSION=1;
 export const BY_ID=new Map(DEX.map(p=>[p.id,p]));
@@ -121,7 +122,7 @@ export function daily(s,date=new Date().toISOString().slice(0,10)){if(s.days.inc
 export function validateSave(raw){
  if(!raw||raw.version!==VERSION||!Array.isArray(raw.party)||!raw.party.length||raw.party.length>300)throw Error('This save is not compatible.');
  const s=structuredClone(raw);
- validateItems(s);validateAdventure(s);validateExpeditions(s);
+ validateItems(s);validateAdventure(s);validateExpeditions(s);validateExploration(s);
  for(const key of ['islandKills','islandGather','islandBosses']){s[key]??=Array(8).fill(0);if(!Array.isArray(s[key])||s[key].length!==8||s[key].some(n=>!Number.isSafeInteger(n)||n<0||n>1e9))throw Error('Invalid island progress.');}
  s.contracts??=[];s.contractClaims??=0;s.discovered??=[];s.treasures??=[];
  if(!Array.isArray(s.contracts)||s.contracts.length>3||s.contracts.some(c=>!/^([1-7])-(hunt|gather|boss)$/.test(c.id)||!Number.isSafeInteger(c.baseline)||c.baseline<0)||!Number.isSafeInteger(s.contractClaims)||s.contractClaims<0||!Array.isArray(s.discovered)||!Array.isArray(s.treasures)||s.discovered.length>21||s.treasures.length>21)throw Error('Invalid expedition records.');

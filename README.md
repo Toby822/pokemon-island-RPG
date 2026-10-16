@@ -21,6 +21,27 @@ No account, purchase, build step or API key is required. Use a current desktop b
 - **Bilingual interface:** Traditional Chinese / English, including bundled official Traditional Chinese names for all 1,025 species.
 - Reduced-motion controls, larger-text preference, keyboard-accessible menus, responsive layouts and optional synthesised sound effects.
 
+## Vaults & Vanguard (v1.6)
+
+- Eight original giant landmarks: Haven castle, ancient treehall, lighthouse shipyard, volcanic fortress, glacier cathedral, storm engine, moonlit oni tower and astral ring temple. Trees have layered canopies, bark, roots and biome-specific silhouettes.
+- Twenty-six distinct 96-pixel equipment illustrations, plus upgraded chest materials and opening effects.
+- **M**, the **Region Map** button or the minimap opens a dedicated map of the current region. Toggle services, districts, unopened treasure, sentinels or resources; choose a destination for a distance readout and screen-edge direction arrow.
+- Each combat region offers **two optional lieutenants and one captain**, as well as its main guardian. Lieutenants have 2.3× ordinary encounter HP and 2.1× XP; captains have 3.8× HP and 3.5× XP. First victories award an equipment voucher; the captain also awards a regional weapon seal. Defeated sentinels recover after three minutes. Their larger health frames and ground crests distinguish them from ordinary enemies.
+- Guardians have 28% more HP and a separate melee cooldown, so their skill cycle no longer prevents contact attacks. Ordinary enemies in the first two combat regions retain their previous HP; later ordinary encounters have 8% more HP.
+- A saved exploration seed varies scenery, resources and treasure while keeping roads, towns, landmarks and residents in their intended places. A co-op host supplies one shared session layout. Changing layouts rescues a player from new obstacles; leaving co-op restores the solo layout without healing.
+- Resource nodes are reduced to **42–54 per combat region**, including at least eight herbs and eight ore nodes. Regrowth takes 90 seconds. Solo cooldowns persist across travel/reload using timestamps; shared-world resources use the host's active simulation clock.
+
+Each combat region contains three personal treasure claims. Opened chests lift their lid, fade away and immediately stop appearing as destinations or interactions. Their region/slot identity is permanent, so reseeding or rejoining cannot reroll an already claimed chest.
+
+| Chest | Base generation chance | Equipment vouchers | Extra |
+| --- | ---: | ---: | --- |
+| Wayfarer — wood | 55% | 1 | Coins and stardust |
+| Silverbound — silver | 30% | 1 | More coins and stardust |
+| Sunforged — gold | 13% | 2 | More coins and stardust |
+| Obsidian Reliquary — black/purple | 2% | 3 | One regional guardian weapon seal |
+
+These are seeded generation probabilities, not a promise that a particular profile will contain every tier. Chests are personal in co-op; a friend's claim does not consume yours. Enemy and resource simulation remains shared.
+
 ## Playing
 
 Choose Bulbasaur, Charmander, Squirtle or Pikachu. Open the island atlas and travel to **Verdant Wilds**. Approach wild Pokémon to auto-attack, then use your elemental skills. Collect rewards from the Journal. Return to Haven before your purse becomes too valuable to risk.
@@ -34,6 +55,7 @@ Choose Bulbasaur, Charmander, Squirtle or Pikachu. Open the island atlas and tra
 | Shift | Dash: brief invulnerability, 2-second cooldown |
 | R | Potion: restore 55% HP and 50% Mana |
 | F | Nearby NPC, bank, forge, shrine, gate, resource or altar |
+| M | Current-region map, layers and destination tracking |
 | Escape | Close a menu |
 
 Menus pause solo play. **Co-op continues while menus are open.** Move somewhere safe before changing your build.
@@ -51,7 +73,7 @@ Menus pause solo play. **Co-op continues while menus are open.** Move somewhere 
 | Moonshade City | 46 | Ghost/Dark/Psychic enemies; Ghost/Dark skills gain 20% damage |
 | Astral Palace | 58 | Dragon/Fairy/Psychic enemies; Rayquaza guardian |
 
-Combat islands have a guardian altar to the north and a Rift portal to the west. Travel ends the current encounter and restores HP/Mana. Earn all seven distinct guardian sigils to finish the final journal objective.
+Combat islands have a guardian altar to the north and a Rift portal to the west. Successful travel to a different region ends the current encounter and restores HP/Mana. Travel is blocked while dying or while a living enemy is within 360 units; selecting the current region does not heal or reset encounters. Earn all seven distinct guardian sigils to finish the final journal objective.
 
 ### Summons and tickets
 
@@ -80,7 +102,7 @@ IV reforging costs 12 stardust and can make stats worse. Releasing a companion g
 
 ## Market district and expedition systems (v1.2)
 
-Every region now uses a 4800 × 3400 world (v1.5), expanded from the 3000 × 2200 v1.2 map and original 1800 × 1400 map. The eastern roads lead to additional districts and three exploration landmarks per combat island. Each landmark awards XP once, and each nearby cache can be claimed once per profile for coins, stardust and an equipment voucher. Resources regrow during active simulation.
+Every region now uses a 4800 × 3400 world (v1.5), expanded from the 3000 × 2200 v1.2 map and original 1800 × 1400 map. The eastern roads lead to additional districts and three exploration landmarks per combat island. Each landmark awards XP once, and each nearby cache can be claimed once per profile for coins, stardust and equipment vouchers according to chest rarity. Resource regrowth and seeded exploration are described in the v1.6 rules above.
 
 | Haven service | Purpose |
 | --- | --- |
@@ -151,6 +173,8 @@ The automated tests cover the full species pool, type immunity, banking/death ac
 
 | File | Responsibility |
 | --- | --- |
+| exploration.js / navigation.js | Seeded layouts, treasure rarity, persistent cooldowns, sentinel rules and local navigation |
+| equipment-art.js / frontier-depth.css | Detailed original equipment SVGs and region-map presentation |
 | items.js | Six equipment rarities, item rolls, loadouts, refinement and bag validation |
 | progression.js | Regional rewards, repeatable contracts, discoveries and treasure |
 | expansion-ui.js | Equipment, emporium, market, contracts, bestiary and town menus |

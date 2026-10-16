@@ -1,4 +1,4 @@
-import {paintArchitecture} from './architecture.js?v=1.5.1';
+import {paintArchitecture} from './architecture.js?v=1.6.0';
 export const WORLD_SIZE={w:4800,h:3400};
 // Original pixel artwork. Coordinates in the painters are native pixels (2 world units).
 export const BIOMES=[
@@ -20,13 +20,13 @@ export const TOWN_BUILDINGS=[
  {x:1930,y:1070,w:202,h:112,label:'RANGERS GUILD',action:'contracts',variant:'guild'},
  {x:1200,y:1310,w:180,h:106,label:'THE ARCHIVIST',action:'bestiary',variant:'archive'},
  {x:600,y:1320,w:176,h:100,label:'EXPLORER’S LODGE',action:'guide',variant:'lodge'},
- {x:2650,y:1360,w:320,h:170,label:'HAVEN KEEP',action:'talk',npcId:'keeper',variant:'fortress'}
+ {x:2650,y:1360,w:400,h:240,label:'HAVEN KEEP',action:'talk',npcId:'keeper',variant:'monument'}
 ];
 export function regionalBuildings(id){const b=BIOMES[id];return [
  {x:1660,y:800,w:176,h:94,label:b.name.toUpperCase()+' RANGERS',action:'contracts',variant:'guild'},
  {x:1240,y:600,w:150,h:88,label:b.name.toUpperCase()+' PROVISIONS',action:'camp',variant:'market'},
  {x:1290,y:1130,w:164,h:102,label:b.name.toUpperCase()+' FIELD STATION',action:'bestiary',variant:'archive'},
- {x:2650,y:1360,w:280,h:160,label:b.name.toUpperCase()+' GRAND HALL',action:'talk',npcId:'region-'+id,variant:id===3||id===4?'fortress':id===5?'tower':id===7?'temple':'guild'}
+ {x:2650,y:1360,w:400,h:240,label:b.name.toUpperCase()+' GRAND HALL',action:'talk',npcId:'region-'+id,variant:'monument'}
  ];}
 // Connected eastern and southern terraces preserve the original arrival area while
 // giving each region three substantial destinations beyond the town roads.
@@ -112,22 +112,25 @@ export function paintTerrain(c,id,w=WORLD_SIZE.w,h=WORLD_SIZE.h){
 }
 export function paintCropBed(c,id,variant=0){const b=BIOMES[id];R(c,'#22312b35',-23,1,54,9);face(c,'#624b38',[[-25,-8],[20,-8],[28,-13],[-17,-13]]);face(c,'#6d4f38',[[20,-8],[28,-13],[28,-5],[20,0]]);R(c,'#8d6b46',-25,-8,45,8);R(c,'#b4915b',-25,-8,45,2);face(c,'#4a3d2d',[[-22,-9],[-16,-12],[25,-12],[19,-9]]);R(c,'#3f3928',-22,-9,42,2);for(let j=0;j<3;j++){const yy=-11+j*3;R(c,'#59462e',-20,yy,37,1);for(let i=0;i<6;i++){const xx=-17+i*6+j%2;R(c,b.leaf[0],xx,yy-3,2,4);R(c,b.leaf[2],xx-1,yy-5,4,2);R(c,b.leaf[3],xx,yy-5,2,1);if(variant===1)R(c,'#dfb65e',xx+1,yy-4,2,2);if(variant===2)R(c,id===4?'#d8dbe6':'#d28867',xx,yy-3,2,2);}}R(c,'#c5a26a',-25,-9,2,9);R(c,'#b4915b',19,-9,2,9);}
 export function paintTree(c,id,kind='tree',size=30,variant=0){
- const b=BIOMES[id],s=size/30;c.save();c.scale(s,s);
- R(c,'#172f354b',-18,0,42,6);R(c,b.trim,-4,-17,8,20);R(c,'#a18057',-3,-17,3,18);R(c,'#453f32',-7,0,4,3);R(c,'#453f32',4,0,5,3);
+ const r=R,b=BIOMES[id],s=size/30,v=Math.abs(Math.floor(variant))%101;c.save();c.scale(s,s);
+ // Separate root flares, trunk planes and overlapping crown volumes read as one tree.
+ face(c,'#14243043',[[-23,1],[-12,-4],[19,-3],[32,3],[20,8],[-13,7]]);
+ const bark=id===4?['#4d5b5c','#748579','#a9b3a0']:id===6?['#494152','#756473','#aa8b91']:['#54432f','#816540','#b2945a'];
+ face(c,bark[0],[[-4,-30],[5,-29],[6,-5],[13,3],[6,4],[1,-2],[-6,4],[-13,4],[-5,-5]]);R(c,bark[1],-3,-29,7,29);R(c,bark[2],-2,-28,2,26);R(c,bark[0],3,-27,2,25);R(c,bark[2],-7,0,4,2);R(c,bark[1],5,1,6,2);
  if(kind==='palm'){
- for(let j=0;j<28;j+=4){R(c,'#806b45',-3+Math.floor(j/14),-j,6,4);R(c,'#b49a61',-2+Math.floor(j/14),-j,2,2);}
- const strips=[[-3,-38,7,12],[-11,-35,20,5],[-22,-30,22,5],[4,-32,22,5],[-26,-25,11,4],[18,-28,14,4],[-18,-36,12,4],[9,-39,15,4]];
- strips.forEach((a,i)=>R(c,b.leaf[i%4],...a));R(c,'#d1af6b',-4,-27,4,4);R(c,'#7b5b3d',2,-29,4,4);
+  const bend=v%3-1;for(let j=0;j<10;j++){const yy=-j*4,xx=Math.round(bend*j*j*.05);R(c,bark[0],xx-3,yy-5,7,6);R(c,bark[1],xx-2,yy-5,5,4);R(c,bark[2],xx-2,yy-5,3,1);R(c,bark[0],xx+2,yy-2,2,2);}const tx=Math.round(bend*4),ty=-40;
+  for(const [dx,dy,len,col] of [[-1,-1,25,2],[1,-1,27,3],[-1,.2,30,1],[1,.25,33,1],[-.3,1,25,0],[.55,1,22,2]]){for(let j=0;j<len;j+=3){const t=j/len,xx=tx+dx*j,yy=ty+dy*j*.55+Math.max(0,t-.45)*8;R(c,b.leaf[col],xx-2,yy,7*(1-t)+2,3);if(j<len*.65)R(c,b.leaf[Math.min(3,col+1)],xx-1,yy,3,1);}}r(c,'#665135',tx-5,ty+4,5,6);r(c,'#b39656',tx-4,ty+4,2,2);r(c,'#80613e',tx+1,ty+3,5,6);r(c,'#d1b277',tx+2,ty+3,2,2);
  }else if(kind==='pine'){
- for(let j=0;j<4;j++){const top=-46+j*9,half=7+j*4;for(let y=0;y<15;y+=3){const k=half*y/15;R(c,b.leaf[j%3],-k,top+y,k*2+3,3);if(id===4&&y<7)R(c,b.leaf[3],-k,top+y,k*2+2,2);}}
+  const hh=51+(v%3)*5;for(let j=0;j<5;j++){const top=-hh+j*8,half=8+j*4,height=20+(j>2?2:0);for(let yy=0;yy<height;yy+=2){const k=half*yy/height,notch=Math.floor(yy/4)%2?2:0;R(c,b.leaf[yy<height*.35?2:yy<height*.75?1:0],-k,top+yy,k*2+3-notch,2);R(c,b.leaf[0],k*.35,top+yy,Math.max(2,k*.65),2);if(id===4&&yy<height*.5)R(c,b.leaf[3],-k,top+yy,k*1.6+2,1);else if(yy%6===0)R(c,b.leaf[2],-k+2,top+yy,Math.max(2,k*.55),1);}R(c,b.leaf[0],-half+3,top+height-2,half*2-3,2);}
  }else if(kind==='mushroom'){
- R(c,'#81779b',-4,-20,8,23);R(c,'#c6a8c6',-3,-18,3,20);
- for(let j=0;j<6;j++){const half=[8,16,22,26,28,24][j];R(c,b.leaf[j<2?3:j<4?2:1],-half,-42+j*4,half*2,4);}for(let i=0;i<8;i++)R(c,'#d1b4cf',Math.round(hash(i,variant)*40)-20,-37+Math.round(hash(variant,i)*14),3,2);
+  r(c,'#554f6c',-6,-25,12,26);r(c,'#9f8ba5',-4,-25,8,25);r(c,'#d3b3c0',-3,-24,3,22);face(c,'#4b3c61',[[-28,-19],[-21,-13],[16,-11],[29,-19],[20,-24],[-18,-25]]);for(let j=0;j<8;j++){const xx=-21+j*6;R(c,'#8e7597',xx,-21,2,5);R(c,'#bea2b8',xx,-20,1,3);}for(let j=0;j<8;j++){const half=[7,14,21,26,30,31,29,24][j],yy=-46+j*3;R(c,b.leaf[j<3?3:j<6?2:1],-half,yy,half*2,3);R(c,b.leaf[1],half-7,yy,7,3);}for(let i=0;i<7;i++){const xx=Math.round(hash(i,v)*40)-21,yy=-41+Math.round(hash(v,i)*12);r(c,'#dec4d1',xx,yy,4,2);r(c,'#b498bd',xx+3,yy+1,2,2);}R(c,b.leaf[3],-13,-41,9,1);R(c,b.leaf[0],-26,-22,51,2);
  }else{
- const bands=[[-38,11],[-34,20],[-30,25],[-26,29],[-22,31],[-18,29],[-14,25],[-10,18]];
- for(let j=0;j<bands.length;j++){const [y,half]=bands[j];R(c,b.leaf[j<2?2:j<5?1:0],-half,y,half*2,4);}
- for(let i=0;i<33;i++){const x=Math.floor(hash(i,variant,id)*47)-24,y=-36+Math.floor(hash(variant,i,id)*24);R(c,b.leaf[i%4],x,y,2+(i%3),2);}
- R(c,b.leaf[3],-15,-34,10,2);R(c,b.leaf[2],-22,-27,7,2);
+  const broad=v%3,foliage=(cx,cy,ww,hh,lit=false)=>{for(let yy=0;yy<hh;yy+=2){const t=yy/hh,half=ww/2*Math.sqrt(Math.max(0,1-(t*2-1)**2)),dent=(Math.floor(yy/4)%3===1?2:0),col=yy<hh*.28?b.leaf[lit?3:2]:yy<hh*.67?b.leaf[lit?2:1]:b.leaf[0];r(c,col,cx-half+dent,cy+yy,half*2-dent,2);if(yy>hh*.22&&yy<hh*.8)R(c,b.leaf[0],cx+half*.55,cy+yy,Math.max(2,half*.45),2);}for(let j=0;j<5;j++){const xx=cx-ww*.27+(j%3)*ww*.18,yy=cy+6+Math.floor(j/3)*7;R(c,b.leaf[lit?3:2],xx,yy,Math.max(3,ww*.18),2);R(c,b.leaf[lit?2:1],xx+3,yy+2,Math.max(3,ww*.15),1);}};
+  R(c,bark[0],-16,-31,14,4);R(c,bark[1],-15,-32,13,2);face(c,bark[0],[[1,-31],[14,-39],[18,-36],[4,-24]]);
+  if(broad===0){foliage(-15,-44,35,28);foliage(16,-47,37,31);foliage(0,-62,43,38,true);foliage(-22,-30,29,23);foliage(20,-29,31,22);foliage(-1,-41,39,30,true);}
+  else if(broad===1){foliage(-20,-45,38,28);foliage(18,-44,43,31);foliage(0,-58,45,35,true);foliage(-6,-34,48,28,true);}
+  else{foliage(-11,-53,34,38);foliage(15,-50,33,38);foliage(1,-69,32,36,true);foliage(-19,-35,28,27);foliage(15,-34,35,27);foliage(-1,-43,34,31,true);}
+  if(id===0&&v%5===0){for(const [xx,yy] of [[-14,-34],[9,-42],[16,-25]]){r(c,'#9b5048',xx,yy,3,3);r(c,'#d88b63',xx,yy,2,1);}}
  }c.restore();
 }
 export function paintRock(c,id,kind='rock',variant=0){const b=BIOMES[id];R(c,'#1d2b3944',-15,0,34,5);
@@ -179,8 +182,32 @@ export function paintBuilding(c,id,o,time=0){
  }
 
 }
+export function paintTreasureChest(c,id,o={},openedProgress=o.opening||0){
+ const r=R,tier=Math.max(0,Math.min(3,Math.floor(o.tier||0))),p=Math.max(0,Math.min(1,Number(openedProgress)||0));
+ const skins=[
+  {wood:['#5e412e','#997044','#c09a61'],metal:['#514c43','#9c9677','#d4c394'],gem:'#b7c58c',inside:'#392f2b'},
+  {wood:['#364d5a','#597789','#839da9'],metal:['#4f626d','#a5b7bc','#d6e3df'],gem:'#73bdc2',inside:'#293b48'},
+  {wood:['#574132','#92704a','#b89560'],metal:['#8c602f','#d4a64f','#f5d894'],gem:'#bc797a',inside:'#49372c'},
+  {wood:['#222033','#39304e','#5d466f'],metal:['#2b293e','#756387','#b99ac2'],gem:'#bd83d2',inside:'#211e31'}
+ ],s=skins[tier],yy=-25-p*18;
+ face(c,'#13213245',[[-23,2],[-12,-4],[25,-3],[39,5],[24,11],[-13,10]]);
+ // Back rim and open cavity precede the body and hinged lid.
+ face(c,s.metal[0],[[-20,-15],[-10,-21],[29,-21],[20,-15]]);face(c,s.inside,[[-16,-14],[-9,-19],[25,-19],[18,-14]]);
+ r(c,s.wood[0],-20,-14,40,19);r(c,s.wood[1],-18,-12,36,14);face(c,s.wood[0],[[20,-14],[29,-20],[29,-1],[20,5]]);face(c,s.wood[1],[[21,-13],[27,-17],[27,-2],[21,2]]);
+ for(let j=0;j<5;j++){const xx=-16+j*7;r(c,s.wood[0],xx,-11,1,14);r(c,s.wood[2],xx+1,-10,4,1);}r(c,s.metal[0],-21,1,42,5);r(c,s.metal[1],-21,1,42,2);face(c,s.metal[0],[[20,1],[30,-5],[30,-1],[20,5]]);
+ for(const xx of [-16,10]){r(c,s.metal[0],xx-1,-14,7,18);r(c,s.metal[1],xx,-14,5,17);r(c,s.metal[2],xx,-13,1,15);for(const ry of [-10,-2])r(c,s.metal[0],xx+2,ry,2,2);}r(c,s.metal[0],-4,-13,9,14);r(c,s.metal[1],-3,-12,7,12);r(c,s.metal[2],-2,-12,4,2);r(c,'#252735',-1,-7,3,4);r(c,s.metal[2],-1,-8,2,1);
+ for(const xx of [-19,16]){r(c,s.metal[0],xx,4,5,4);r(c,s.metal[1],xx,3,5,2);}r(c,s.metal[1],23,-9,4,5);r(c,s.metal[0],24,-8,2,3);
+ // The top has a short curved front and a separate receding right plane.
+ const lidH=13+p*13;face(c,s.wood[0],[[-20,yy+5],[-17,yy+1],[-11,yy-2],[14,yy-2],[20,yy+4],[20,yy+lidH],[-20,yy+lidH]]);face(c,s.wood[1],[[-18,yy+4],[-12,yy-1],[12,yy-1],[18,yy+4],[18,yy+lidH-2],[-18,yy+lidH-2]]);face(c,s.wood[2],[[-17,yy+3],[-10,yy-1],[14,yy-1],[18,yy+3]]);face(c,s.wood[0],[[20,yy+4],[29,yy-2],[29,yy+lidH-6],[20,yy+lidH]]);face(c,s.wood[2],[[-11,yy-2],[-2,yy-8],[22,yy-8],[29,yy-2],[20,yy+4],[14,yy-2]]);r(c,s.wood[0],-17,yy+7,34,1);
+ for(const xx of [-16,10]){r(c,s.metal[0],xx-1,yy+2,7,lidH-1);r(c,s.metal[1],xx,yy+1,5,lidH);r(c,s.metal[2],xx,yy+2,1,lidH-2);face(c,s.metal[1],[[xx,yy+1],[xx+9,yy-5],[xx+14,yy-5],[xx+5,yy+1]]);r(c,s.metal[2],xx+8,yy-5,5,1);}r(c,s.metal[0],-21,yy+lidH-1,42,3);r(c,s.metal[1],-20,yy+lidH-1,40,1);
+ if(tier>0){face(c,s.metal[0],[[-7,yy+4],[0,yy-1],[7,yy+4],[0,yy+10]]);face(c,s.gem,[[-4,yy+4],[0,yy+1],[4,yy+4],[0,yy+8]]);r(c,s.metal[2],-1,yy+2,1,3);}
+ if(tier===2){for(const xx of [-22,18]){r(c,s.metal[1],xx,-17,4,5);r(c,s.metal[2],xx,-17,4,1);}r(c,s.metal[1],-7,0,15,2);}
+ if(tier===3){for(const xx of [-23,19]){face(c,s.metal[0],[[xx,-12],[xx-1,-23],[xx+4,-18],[xx+6,-12]]);r(c,s.metal[2],xx+1,-19,1,7);}for(const xx of [-9,7]){r(c,s.gem,xx,-8,2,2);r(c,s.metal[0],xx+2,-7,2,4);}r(c,s.gem,-11,yy+lidH,5,1);r(c,s.gem,8,yy+lidH,5,1);}
+ if(p>.15){face(c,s.gem,[[-12,-15],[-7,-19],[23,-19],[17,-15]]);r(c,s.metal[2],-8,-16,8,1);r(c,s.metal[2],9,-17,6,1);}
+}
 export function paintProp(c,id,o,time=0,ox=0,oy=0){const b=BIOMES[id],kind=o.kind;c.save();c.translate(ox,oy);
- if(kind==='crate'){R(c,'#493e36',-9,-17,19,18);R(c,'#aa8758',-8,-16,17,16);for(let i=0;i<3;i++)R(c,'#705a40',-7+i*6,-15,1,14);R(c,'#d0ad72',-8,-16,17,2);R(c,'#d0ad72',-8,-2,17,2);R(c,'#e2c98b',-1,-9,4,4);if(o.action==='treasure'){R(c,'#6a6048',-9,-11,19,2);R(c,'#f3d58c',-1,-10,3,3);}}
+ if(kind==='treasure'||kind==='crate'&&o.action==='treasure')paintTreasureChest(c,id,o);
+ else if(kind==='crate'){R(c,'#493e36',-9,-17,19,18);R(c,'#aa8758',-8,-16,17,16);for(let i=0;i<3;i++)R(c,'#705a40',-7+i*6,-15,1,14);R(c,'#d0ad72',-8,-16,17,2);R(c,'#d0ad72',-8,-2,17,2);R(c,'#e2c98b',-1,-9,4,4);if(o.action==='treasure'){R(c,'#6a6048',-9,-11,19,2);R(c,'#f3d58c',-1,-10,3,3);}}
  else if(kind==='barrel'){R(c,'#534638',-6,-16,13,17);R(c,'#9d7c50',-8,-13,17,11);R(c,'#c39c66',-5,-16,10,2);R(c,'#55564e',-8,-11,17,2);R(c,'#55564e',-8,-3,17,2);R(c,'#c39c66',-4,-9,2,5);}
  else if(kind==='bench'){R(c,'#18232e3d',-15,4,40,5);for(const xx of [-13,12]){R(c,b.trim,xx,-16,3,22);R(c,'#ac8a5d',xx+1,-16,1,21);}R(c,'#a58354',-16,-18,33,7);R(c,'#cba775',-15,-18,31,2);R(c,'#6c523c',-16,-12,33,2);face(c,'#c3a16b',[[-17,-5],[-10,-10],[24,-10],[17,-5]]);R(c,'#856542',-17,-5,34,4);face(c,'#674d38',[[17,-5],[24,-10],[24,-6],[17,-1]]);for(const xx of [-14,13])R(c,b.trim,xx,-1,3,8);R(c,'#e0bd86',-16,-5,32,1);}
  else if(kind==='flowers'){R(c,'#67543d',-13,-4,26,6);R(c,'#9f8252',-13,-4,26,2);for(let i=0;i<5;i++){R(c,b.leaf[1],-10+i*5,-8,2,5);R(c,i%2?'#e7b4b8':'#edcf80',-11+i*5,-10-i%2,4,3);}}
@@ -204,7 +231,7 @@ export function paintProp(c,id,o,time=0,ox=0,oy=0){const b=BIOMES[id],kind=o.kin
  else if(kind==='herb'){R(c,b.leaf[0],-1,-8,2,9);R(c,b.leaf[2],-6,-8,6,3);R(c,b.leaf[3],1,-12,5,3);R(c,'#e5cea0',-2,-15,4,3);}
  else if(kind==='mushrooms'){R(c,'#c4ad93',-2,-7,3,8);R(c,'#b17c82',-7,-10,13,4);R(c,'#efc7a5',-4,-10,3,2);R(c,'#e4c5a6',4,-5,7,3);}
  else if(['shrine','altar','portal','rift'].includes(kind)){
- const col=kind==='rift'?'#cb9bdf':kind==='altar'?'#efc786':'#9bded0';R(c,'#273b4844',-23,0,48,7);R(c,b.stone,-21,-4,42,8);R(c,b.wall[1],-18,-6,36,4);R(c,b.trim,-14,-5,28,2);
+ const col=o.action==='sentinel'?(o.eliteRank===2?'#c6a4ed':'#95d5e7'):kind==='rift'?'#cb9bdf':kind==='altar'?'#efc786':'#9bded0';R(c,'#273b4844',-23,0,48,7);R(c,b.stone,-21,-4,42,8);R(c,b.wall[1],-18,-6,36,4);R(c,b.trim,-14,-5,28,2);
  if(kind==='portal'||kind==='rift'){for(let yy=-39;yy<-4;yy+=3){const half=Math.round(12*Math.sqrt(Math.max(0,1-((yy+22)/19)**2)));R(c,b.trim,-half-3,yy,4,3);R(c,b.trim,half,yy,4,3);R(c,col,-half,yy,2,3);R(c,col,half-1,yy,2,3);if(Math.floor(yy/3+time*4)%3===0)R(c,'#d9e2e0',-half+3,yy,Math.max(1,half*2-6),1);}R(c,b.wall[1],-18,-5,8,4);R(c,b.wall[1],11,-5,8,4);}
  else{R(c,b.trim,-9,-25,18,21);R(c,b.stone,-7,-25,14,19);R(c,b.wall[1],-12,-28,24,5);const yy=-41+(Math.floor(time*2)%2);for(let j=0;j<13;j++){const ww=j<7?j:13-j;R(c,j<6?col:b.light,-ww/2,yy+j,ww+1,1);}}
  }c.restore();
