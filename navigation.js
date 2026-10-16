@@ -1,9 +1,9 @@
-import {WORLD_SIZE,onIsland,groundAt,roadAt,REGION_SITES} from './pixel-art.js?v=1.5.0';
-import {t,translateText} from './i18n.js?v=1.5.0';
+import {WORLD_SIZE,onIsland,groundAt,roadAt,REGION_SITES} from './pixel-art.js?v=1.5.1';
+import {t,translateText} from './i18n.js?v=1.5.1';
 const navEscape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mapDestinations(world){
  const locations=(REGION_SITES[world.id]||[]).map((p,i)=>({...p,key:'site-'+i,kind:'district',label:String(i+1),nameEn:p.name,nameZh:p.zh,name:t(p.name,p.zh||p.name)}));
- for(const [i,o] of world.objects.entries())if(o.kind==='house'||o.kind==='portal'||o.kind==='rift'||o.kind==='altar'&&o.action==='boss')locations.push({key:'object-'+i,x:o.x,y:o.y+(o.kind==='house'?45:0),kind:o.action==='boss'?'guardian':o.kind==='house'?'service':'gate',label:o.action==='boss'?'♛':o.kind==='house'?'⌂':'◇',nameEn:o.label,name:translateText(o.label)});
+ for(const [i,o] of world.objects.entries())if(o.kind==='house'&&!Number.isInteger(o.district)||o.kind==='portal'||o.kind==='rift'||o.kind==='altar'&&o.action==='boss')locations.push({key:'object-'+i,x:o.x,y:o.y+(o.kind==='house'?45:0),kind:o.action==='boss'?'guardian':o.kind==='house'?'service':'gate',label:o.action==='boss'?'♛':o.kind==='house'?'⌂':'◇',nameEn:o.label,name:translateText(o.label)});
  return locations;
 }
 export function regionMapHTML(world){

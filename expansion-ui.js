@@ -1,8 +1,8 @@
-import {translateText} from './i18n.js?v=1.5.0';
-import {pixelIcon,sceneArt,buildingArt} from './ui-art.js?v=1.5.0';
-import {ITEM_TIERS,GEAR_TYPES,ITEM_BY_ID,SLOTS,SLOT_NAMES,itemName,itemBonuses,gearIcon,createItem,equipItem,rollEquipment,salvageItem,upgradeItem} from './items.js?v=1.5.0';
-import {ISLANDS,awardXP,xpNeeded} from './core.js?v=1.5.0';
-import {contractList,acceptContract,contractProgress,finishContract,LANDMARKS,combatReward} from './progression.js?v=1.5.0';
+import {translateText} from './i18n.js?v=1.5.1';
+import {pixelIcon,sceneArt,buildingArt} from './ui-art.js?v=1.5.1';
+import {ITEM_TIERS,GEAR_TYPES,ITEM_BY_ID,SLOTS,SLOT_NAMES,itemName,itemBonuses,gearIcon,createItem,equipItem,rollEquipment,salvageItem,upgradeItem} from './items.js?v=1.5.1';
+import {ISLANDS,awardXP,xpNeeded} from './core.js?v=1.5.1';
+import {contractList,acceptContract,contractProgress,finishContract,LANDMARKS,combatReward} from './progression.js?v=1.5.1';
 export function installExpansion(api){
  const {world,coop,modal,changed,toast,esc}=api;let bagPage=0,bagFilter='',rollKind='all',lastItem=null,bagSlot='all',bagSearch='',bagSort='newest',bagFavorite=false;
  const state=()=>api.state();

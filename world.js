@@ -1,13 +1,13 @@
-import {noteExpeditionEvent} from './expeditions.js?v=1.5.0';
-import {drawEnemyHUD,drawHazards,drawCinematic} from './combat-view.js?v=1.5.0';
-import {NPCS} from './dialogue.js?v=1.5.0';
-import {translateText,t} from './i18n.js?v=1.5.0';
-import {BOSS_PROFILES,makeHazards,hazardContains,encounterPower} from './bosses.js?v=1.5.0';
-import {BY_ID,ISLANDS,COLORS,stats,damage,typeMultiplier,clamp,choose,awardXP,die,pretty,enemyRole} from './core.js?v=1.5.0';
-import {itemBonuses,createItem,GEAR_TYPES,ITEM_TIERS,itemName} from './items.js?v=1.5.0';
-import {LANDMARKS,discover,openTreasure,combatReward} from './progression.js?v=1.5.0';
-import {SpriteBank,facing} from './sprites.js?v=1.5.0';
-import {BIOMES,TOWN_BUILDINGS,regionalBuildings,onIsland,walkableGround,roadAt,paintTerrain,paintObject,paintProp,WORLD_SIZE,REGION_SITES,REGION_DECOR} from './pixel-art.js?v=1.5.0';
+import {noteExpeditionEvent} from './expeditions.js?v=1.5.1';
+import {drawEnemyHUD,drawHazards,drawCinematic} from './combat-view.js?v=1.5.1';
+import {NPCS} from './dialogue.js?v=1.5.1';
+import {translateText,t} from './i18n.js?v=1.5.1';
+import {BOSS_PROFILES,makeHazards,hazardContains,encounterPower} from './bosses.js?v=1.5.1';
+import {BY_ID,ISLANDS,COLORS,stats,damage,typeMultiplier,clamp,choose,awardXP,die,pretty,enemyRole} from './core.js?v=1.5.1';
+import {itemBonuses,createItem,GEAR_TYPES,ITEM_TIERS,itemName} from './items.js?v=1.5.1';
+import {LANDMARKS,discover,openTreasure,combatReward} from './progression.js?v=1.5.1';
+import {SpriteBank,facing} from './sprites.js?v=1.5.1';
+import {BIOMES,TOWN_BUILDINGS,regionalBuildings,onIsland,walkableGround,roadAt,paintTerrain,paintObject,paintProp,WORLD_SIZE,REGION_SITES,REGION_DECOR} from './pixel-art.js?v=1.5.1';
 export const SIZE=WORLD_SIZE;
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function seeded(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
@@ -35,7 +35,7 @@ export class World{
  }
  generate(){
  const rnd=seeded(this.id*739+147),b=BIOMES[this.id];this.objects=[];this.nodes=[];this.collisionGrid=null;
- const outer=REGION_SITES[this.id].map((site,index)=>({x:site.x,y:site.y-135,w:index===1?200:180,h:index===1?110:90,label:site.name,action:this.id?'expeditions':'guide',variant:(this.id===3?['fortress','forge','market']:this.id===2?['market','guild','archive']:['guild','archive','lodge'])[index]}));
+ const outer=REGION_SITES[this.id].map((site,index)=>({x:site.x,y:site.y-135,w:index===1?200:180,h:index===1?110:90,label:site.name,district:index,action:this.id?'expeditions':'guide',variant:(this.id===3?['fortress','forge','market']:this.id===2?['market','guild','archive']:['guild','archive','lodge'])[index]}));
  const houses=[...(this.id?regionalBuildings(this.id):TOWN_BUILDINGS),...outer];
  for(const [index,site] of REGION_SITES[this.id].entries())this.objects.push({kind:'board',x:site.x,y:site.y,w:0,h:0,solid:false,label:site.name,action:this.id?'expeditions':'guide',site:index});
  this.objects.push(...houses.map(o=>({kind:'house',solid:true,...o})));

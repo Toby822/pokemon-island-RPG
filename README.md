@@ -276,3 +276,5 @@ The final chapter in each region also grants a regional guardian seal and summon
 Starting a new Rift clears expired encounter effects. An active guardian cannot be erased by opening a Rift, and another explorer cannot restart an already active shared Rift or reset its wave/Arceus timer. Boss phase cut-ins now give a protected pause before the next warning pattern. Multiplayer protocol v5 separates the expanded terrain from earlier clients; existing host/session limitations still apply.
 
 Validation adds twenty-one-chapter completion, event routing, one-time claim and recipe accounting, old-save migration, district reachability, collision equivalence, map destinations, repeated-Rift protection and no-write bilingual HUD regressions. These automated checks and mocked menu/render checks do not replace actual browser layout or cross-network WebRTC playtests.
+
+The v1.5.1 navigation polish removes duplicate outer-district/building map pins and adds a direct **Track destination** button to active exploration objectives.

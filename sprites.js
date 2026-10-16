@@ -1,4 +1,4 @@
-import {STARTER_ANIMS} from './pmd-meta.js?v=1.5.0';
+import {STARTER_ANIMS} from './pmd-meta.js?v=1.5.1';
 const SOURCE='https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/';
 // Native PMD rows: S, SE, E, NE, N, NW, W, SW.
 export function facing(dx,dy,last=0){return dx||dy?(Math.round(Math.atan2(dx,dy)/(Math.PI/4))+8)%8:last;}

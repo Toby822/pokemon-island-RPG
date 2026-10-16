@@ -1,9 +1,9 @@
-import {TALENTS,talentBudget,talentSpent,learnTalent,resetTalents} from './talents.js?v=1.5.0';
-import {BOSS_ODDS,rollBossWeapon} from './boss-armory.js?v=1.5.0';
-import {GEAR_TYPES,ITEM_TIERS,gearIcon,itemName} from './items.js?v=1.5.0';
-import {ISLANDS} from './core.js?v=1.5.0';
-import {sceneArt,pixelIcon} from './ui-art.js?v=1.5.0';
-import {t,translateText} from './i18n.js?v=1.5.0';
+import {TALENTS,talentBudget,talentSpent,learnTalent,resetTalents} from './talents.js?v=1.5.1';
+import {BOSS_ODDS,rollBossWeapon} from './boss-armory.js?v=1.5.1';
+import {GEAR_TYPES,ITEM_TIERS,gearIcon,itemName} from './items.js?v=1.5.1';
+import {ISLANDS} from './core.js?v=1.5.1';
+import {sceneArt,pixelIcon} from './ui-art.js?v=1.5.1';
+import {t,translateText} from './i18n.js?v=1.5.1';
 export function installChronicles(api){const {world,modal,changed,toast,esc}=api,state=api.state;let region=1,last=null,codexFilter='all';
  function talents(){const s=state();modal('Talent Tree','<p class="panel-intro">'+t('One talent point every two trainer levels. Each node has three ranks; learn two ranks of its parent to open the next node. Your choice affects every active companion.','訓練家每提升兩級可獲得一點天賦。每個節點最多三級，前置天賦至少二級才可學習下一節點；效果適用於所有出戰夥伴。')+'</p><div class="talent-summary">'+pixelIcon('star')+'<b>'+t('Available points','可用點數')+': '+(talentBudget(s)-talentSpent(s))+'</b><span>'+t('Spent','已使用')+' '+talentSpent(s)+' / '+talentBudget(s)+'</span><button id="reset-talents" class="secondary">Reset talents · 250 coins</button></div><div class="talent-tree">'+['Wind','Stone','Arcana'].map((branch,index)=>'<section class="talent-branch branch-'+index+'"><h3>'+t(branch,['疾風','磐石','奧術'][index])+'</h3>'+TALENTS.filter(n=>n.branch===branch).map(n=>{const rank=s.talents[n.id]||0,available=s.trainer>=n.level&&(!n.parent||(s.talents[n.parent]||0)>=2)&&rank<3&&talentSpent(s)<talentBudget(s);return '<article class="talent-node '+(rank?'learned':'')+'">'+pixelIcon(['boots','shield','mana'][index])+'<div><h4>'+t(n.name,n.zh)+'</h4><p>'+t(n.desc,n.descZh)+'</p><small>'+t('Trainer Lv. ','訓練家等級 ')+n.level+(n.parent?' · '+t('Parent rank 2','前置天賦二級'):'')+'</small><div class="rank-pips">'+[1,2,3].map(v=>'<i class="'+(rank>=v?'filled':'')+'"></i>').join('')+'</div></div><button data-learn-talent="'+n.id+'" '+(!available?'disabled':'')+'>'+t(rank===3?'Max rank':'Learn',rank===3?'已滿級':'學習')+' '+rank+'/3</button></article>';}).join('')+'</section>').join('')+'</div>','PASSIVE TALENTS');}
  function relicCard(item){const type=GEAR_TYPES.find(i=>i.id===item.template),tier=ITEM_TIERS[item.tier];return '<article class="equipment-card reveal-item" style="--rarity:'+tier.color+'">'+gearIcon(type.icon,tier.color)+'<small class="rarity-tag">'+tier.name+(item.shiny?' · SHINY':'')+'</small><h3>'+esc(itemName(item))+'</h3><p>'+type.desc+'</p><button data-item-view="'+item.uid+'" class="primary">Inspect item</button></article>';}

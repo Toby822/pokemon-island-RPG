@@ -1,6 +1,6 @@
 import {mkdirSync,writeFileSync} from 'node:fs';
-import {paintScene} from '../art-scenes.js?v=1.5.0';
-import {paintIcon} from '../ui-art.js?v=1.5.0';
+import {paintScene} from '../art-scenes.js?v=1.5.1';
+import {paintIcon} from '../ui-art.js?v=1.5.1';
 class Recorder{
  constructor(){this.rects=[];this.fillStyle='#000000';this.a=1;this.d=1;this.e=0;this.f=0;this.stack=[];}
  save(){this.stack.push([this.a,this.d,this.e,this.f,this.fillStyle]);}
