@@ -16,7 +16,7 @@ jobs:
           node-version: '22'
       - name: Check JavaScript syntax
         run: |
-          for file in *.js *.mjs; do
+          for file in *.js *.mjs tools/*.mjs; do
             node --check "$file"
           done
       - name: Test gameplay rules and economy

@@ -1,6 +1,7 @@
 import {STARTER_ANIMS} from './pmd-meta.js';
 const SOURCE='https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/';
-export function facing(dx,dy,last=0){return dx||dy?(Math.round(Math.atan2(-dx,dy)/(Math.PI/4))+8)%8:last;}
+// Native PMD rows: S, SE, E, NE, N, NW, W, SW.
+export function facing(dx,dy,last=0){return dx||dy?(Math.round(Math.atan2(dx,dy)/(Math.PI/4))+8)%8:last;}
 export function animationFrame(durations,seconds,loop=true){
  if(!durations?.length)return 0;
  const total=durations.reduce((a,b)=>a+b,0);

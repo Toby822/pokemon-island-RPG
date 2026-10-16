@@ -42,12 +42,12 @@ Menus pause solo play. **Co-op continues while menus are open.** Move somewhere 
 | --- | ---: | --- |
 | Aether Haven | 1 | Bank, shrine, forge, healing and journal |
 | Verdant Wilds | 1 | Grass/Bug/Normal enemies; Venusaur guardian |
-| Coral Coast | 4 | Water coast; Water skills gain 20% damage |
-| Cinder Crater | 7 | Fire/Rock/Ground enemies; Charizard guardian |
-| Frostveil Reach | 10 | Ice/Steel enemies; wild movement slowed by 15% |
-| Stormglass Peaks | 14 | Electric/Flying/Dragon enemies; Electric skills gain 20% damage |
-| Moonshade Hollow | 18 | Ghost/Dark/Psychic enemies; Ghost/Dark skills gain 20% damage |
-| Astral Sanctuary | 24 | Dragon/Fairy/Psychic enemies; Rayquaza guardian |
+| Coral Coast | 8 | Water coast; Water skills gain 20% damage |
+| Cinder Crater | 16 | Fire/Rock/Ground enemies; Charizard guardian |
+| Frostveil Reach | 25 | Ice/Steel enemies; wild movement slowed by 15% |
+| Stormglass Peaks | 35 | Electric/Flying/Dragon enemies; Electric skills gain 20% damage |
+| Moonshade Hollow | 46 | Ghost/Dark/Psychic enemies; Ghost/Dark skills gain 20% damage |
+| Astral Sanctuary | 58 | Dragon/Fairy/Psychic enemies; Rayquaza guardian |
 
 Combat islands have a guardian altar to the north and a Rift portal to the west. Travel ends the current encounter and restores HP/Mana. Earn all seven distinct guardian sigils to finish the final journal objective.
 
@@ -176,3 +176,29 @@ Pokémon names, characters and sprites belong to their respective rights holders
 ### Restarting your adventure
 
 Open the top-right **⚙ Settings → Restart adventure**. You can export a save or cancel before confirming **Delete progress & choose starter**. Confirmation clears this browser’s saved adventure and leaves multiplayer, then returns to the four starter choices. It removes Pokémon, levels, equipment and all money, including the bank. Your fresh adventure is saved after you choose a partner and press **Begin your journey**.
+
+
+## Pixel Expeditions (v1.3)
+
+The PMD facing bug is fixed: right movement selects the native east row (2), and left movement selects west (6). Tests check both movement and the actual sprite source rectangles.
+
+The overworld uses original pixel tile painters with biome palettes, stone paths, wooden bridges, stepped coastlines, water/lava, walkable ice, trees, palms, mushrooms, crops and crystals. Buildings include forest lookout porches, coastal lighthouse towers, forge chimneys, snowy roofs/log piles, storm coils, layered pagoda roofs and temple columns. Shop/atlas illustrations and the 17 item icons are bundled SVGs generated from the same art code; run `npm run art` to rebuild them. No PokéSurvivor, Stardew Valley or Square Enix textures were copied.
+
+Menus now use a readable default size, higher text contrast, larger buttons, illustrated service headers, real coin/item pictures and a **Settings → Text size → Larger text** preference. The preference survives adventure resets. The atlas includes encounter portraits, type labels, guardian levels, regional XP ranges and next-island progress. Press **M** to open or close it. Minimap gold markers indicate buildings.
+
+| Island | Trainer unlock | Wild levels | Guardian | Guardian level |
+| --- | ---: | --- | --- | ---: |
+| Aether Haven | 1 | Safe town | — | — |
+| Verdant Wilds | 1 | 1–5 | Venusaur | 8 |
+| Coral Coast | 8 | 8–12 | Gyarados | 16 |
+| Cinder Crater | 16 | 16–21 | Charizard | 26 |
+| Frostveil Reach | 25 | 25–30 | Lapras | 36 |
+| Stormglass Peaks | 35 | 35–40 | Dragonite | 47 |
+| Moonshade Hollow | 46 | 46–51 | Gengar | 59 |
+| Astral Sanctuary | 58 | 58–63 | Rayquaza | 70 |
+
+Rift wild levels are the region’s minimum plus the wave number; Rift guardians use the guardian level plus the wave number. Trainer/companion levels still cap at 60. Higher regional unlocks apply to existing saves too; collections, equipment and currency are retained.
+
+Each combat island has a Rangers outpost, a regional provisioner selling potions, a field station, three exploration landmarks and three one-time caches. Enemy roles include close-combat brawlers, ranged attackers that hold their distance, faster skirmishers, and healers that restore 10% of nearby enemies’ maximum HP every seven seconds. Enemy/player projectiles collide with terrain obstacles. Shared worlds run these rules in the host’s island simulations. This update retains the browser-hosted multiplayer limits described above.
+
+Headless tests check reachable entrances, landmarks and caches on every island, valid arrival tiles, shared resource geometry, wild/guardian/Rift level ranges, ground collision, healing behaviour and movement directions. Local startup checks also exercise the menus and restart flow. Internet WebRTC and browser layout require separate live verification.

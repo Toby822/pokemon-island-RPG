@@ -44,3 +44,12 @@ An unofficial non-commercial fan project. The source is visible for inspection; 
 ## v1.2 systems research
 
 The official Hypixel wiki’s [Weapons](https://wiki.hypixel.net/Weapons), [Dragontail Blacksmith](https://wiki.hypixel.net/Dragontail_Blacksmith) and [Quests](https://wiki.hypixel.net/Quests) pages informed the broad shop, refinement and progression loops. Item names, rarity odds, formulas, equipment art and implementation in this release are custom and do not reproduce Hypixel’s code or exact balance.
+
+
+### Pixel Expeditions research and original art
+
+- PokéSurvivor by JPTER78: https://jpter78.itch.io/pokesurvivor and https://github.com/JPTER78/pokesurvivor — research into PMD direction ordering, readable combat, enemy roles and pixel tile composition. No source code or terrain textures from that project were incorporated.
+- Stardew Valley official media: https://www.stardewvalley.net/media/ — visual reference for grounded building silhouettes, paths and small environmental props.
+- Square Enix, OCTOPATH TRAVELER HD-2D overview: https://www.jp.square-enix.com/octopathtraveler/about/ — visual reference for layered foreground/background treatment. This project remains Canvas 2D.
+- Game Accessibility Guidelines: https://gameaccessibilityguidelines.com/use-an-easily-readable-default-font-size/ and https://gameaccessibilityguidelines.com/provide-high-contrast-between-text-ui-and-background/ — readable default size and contrast guidance.
+- The biome tiles, structures, UI scene illustrations and coin/item SVGs in `pixel-art.js`, `art-scenes.js`, `ui-art.js` and `assets/scenes` / `assets/icons` are original artwork for this project, created in code. They are separate from the Pokémon sprites credited above.

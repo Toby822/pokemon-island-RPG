@@ -5,14 +5,14 @@ export const VERSION=1;
 export const BY_ID=new Map(DEX.map(p=>[p.id,p]));
 export const COLORS={normal:'#b6ac91',fire:'#ff9960',water:'#66bcec',electric:'#f6d76a',grass:'#85cf82',ice:'#a6e7e7',fighting:'#e48f79',poison:'#c491dc',ground:'#ddc18a',flying:'#a7baf2',psychic:'#f497be',bug:'#bed36c',rock:'#c8b894',ghost:'#af9bdc',dragon:'#9b9aff',dark:'#ad9d91',steel:'#b6cbd1',fairy:'#edb4d6'};
 export const ISLANDS=[
- {id:0,name:'Aether Haven',sub:'A little home between adventures',level:1,color:'#9ec791',ground:'#6c9f69',water:'#316f86',weather:'petals',types:[],mobs:[],boss:143,desc:'Bank, summon shrine, forge and a quiet place to recover.'},
- {id:1,name:'Verdant Wilds',sub:'Follow the fireflies',level:1,color:'#a4d892',ground:'#568257',water:'#326d79',weather:'petals',types:['grass','bug','normal'],mobs:[10,13,16,19,43,46,69,163,263,415],boss:3,desc:'Soft grass, old ruins and a restless forest guardian.'},
- {id:2,name:'Coral Coast',sub:'Where the tide keeps secrets',level:4,color:'#9ddbd5',ground:'#b5ae7c',water:'#287f99',weather:'rain',types:['water','flying'],mobs:[54,60,72,90,98,116,120,183,278,341],boss:130,desc:'Rain empowers Water skills. Dodge the tidekeeper’s waves.'},
- {id:3,name:'Cinder Crater',sub:'Some things refuse to cool',level:7,color:'#f2b285',ground:'#715a53',water:'#a83d37',weather:'embers',types:['fire','rock','ground'],mobs:[37,58,74,77,95,104,218,322,524,662],boss:6,desc:'Volcanic stones, molten rivers and an airborne guardian.'},
- {id:4,name:'Frostveil Reach',sub:'Listen to the falling snow',level:10,color:'#c8e5f0',ground:'#a0bec3',water:'#426f95',weather:'snow',types:['ice','steel'],mobs:[86,87,220,225,361,363,436,582,613,712],boss:131,desc:'Snow slows wild Pokémon. Shelter among frost crystals.'},
- {id:5,name:'Stormglass Peaks',sub:'Walk above the thunder',level:14,color:'#d8d69a',ground:'#788071',water:'#3c5675',weather:'rain',types:['electric','flying','dragon'],mobs:[25,81,100,125,147,179,333,403,587,848],boss:149,desc:'Electric attacks resonate in the storm. Mind the charged floor.'},
- {id:6,name:'Moonshade Hollow',sub:'The forest remembers you',level:18,color:'#c4abe2',ground:'#55516d',water:'#353b66',weather:'wisps',types:['ghost','dark','psychic'],mobs:[92,93,200,215,228,280,353,425,607,778],boss:94,desc:'Moonlit ruins. Dark and Ghost skills gain a night-time echo.'},
- {id:7,name:'Astral Sanctuary',sub:'The edge of the known sky',level:24,color:'#e6c1ea',ground:'#81769c',water:'#3d416f',weather:'stars',types:['dragon','fairy','psychic'],mobs:[35,63,148,176,281,371,443,704,856,885],boss:384,desc:'Endgame sanctuary. Its guardian guards the final sigil.'}
+ {id:0,name:'Aether Haven',sub:'A little home between adventures',level:1,mobMin:0,mobMax:0,bossLevel:0,color:'#9ec791',ground:'#6c9f69',water:'#316f86',weather:'petals',types:[],mobs:[],boss:143,desc:'Bank, summon shrine, forge and a quiet place to recover.'},
+ {id:1,name:'Verdant Wilds',sub:'Follow the fireflies',level:1,mobMin:1,mobMax:5,bossLevel:8,color:'#a4d892',ground:'#568257',water:'#326d79',weather:'petals',types:['grass','bug','normal'],mobs:[10,13,16,19,43,46,69,163,263,415],boss:3,desc:'Soft grass, old ruins and a restless forest guardian.'},
+ {id:2,name:'Coral Coast',sub:'Where the tide keeps secrets',level:8,mobMin:8,mobMax:12,bossLevel:16,color:'#9ddbd5',ground:'#b5ae7c',water:'#287f99',weather:'rain',types:['water','flying'],mobs:[54,60,72,90,98,116,120,183,278,341],boss:130,desc:'Rain empowers Water skills. Dodge the tidekeeper’s waves.'},
+ {id:3,name:'Cinder Crater',sub:'Some things refuse to cool',level:16,mobMin:16,mobMax:21,bossLevel:26,color:'#f2b285',ground:'#715a53',water:'#a83d37',weather:'embers',types:['fire','rock','ground'],mobs:[37,58,74,77,95,104,218,322,524,662],boss:6,desc:'Volcanic stones, molten rivers and an airborne guardian.'},
+ {id:4,name:'Frostveil Reach',sub:'Listen to the falling snow',level:25,mobMin:25,mobMax:30,bossLevel:36,color:'#c8e5f0',ground:'#a0bec3',water:'#426f95',weather:'snow',types:['ice','steel'],mobs:[86,87,220,225,361,363,436,582,613,712],boss:131,desc:'Snow slows wild Pokémon. Shelter among frost crystals.'},
+ {id:5,name:'Stormglass Peaks',sub:'Walk above the thunder',level:35,mobMin:35,mobMax:40,bossLevel:47,color:'#d8d69a',ground:'#788071',water:'#3c5675',weather:'rain',types:['electric','flying','dragon'],mobs:[25,81,100,125,147,179,333,403,587,848],boss:149,desc:'Electric attacks resonate in the storm. Mind the charged floor.'},
+ {id:6,name:'Moonshade Hollow',sub:'The forest remembers you',level:46,mobMin:46,mobMax:51,bossLevel:59,color:'#c4abe2',ground:'#55516d',water:'#353b66',weather:'wisps',types:['ghost','dark','psychic'],mobs:[92,93,200,215,228,280,353,425,607,778],boss:94,desc:'Moonlit ruins. Dark and Ghost skills gain a night-time echo.'},
+ {id:7,name:'Astral Sanctuary',sub:'The edge of the known sky',level:58,mobMin:58,mobMax:63,bossLevel:70,color:'#e6c1ea',ground:'#81769c',water:'#3d416f',weather:'stars',types:['dragon','fairy','psychic'],mobs:[35,63,148,176,281,371,443,704,856,885],boss:384,desc:'Endgame sanctuary. Its guardian guards the final sigil.'}
 ];
 export const RARITIES=['Common','Uncommon','Rare','Epic','Legendary'];
 export const RARITY_COLORS=['#aab9ae','#83c5a0','#82b9ee','#c699f0','#f5ce79'];
@@ -48,6 +48,7 @@ export function createMon(id,rng=Math.random,minIV=0){
 export function newGame(id=25){
  return migrateItems({islandKills:Array(8).fill(0),islandGather:Array(8).fill(0),islandBosses:Array(8).fill(0),contracts:[],contractClaims:0,discovered:[],treasures:[],version:VERSION,trainer:1,xp:0,coins:250,bank:0,tickets:5,shards:0,ore:0,herbs:0,potions:4,pity:0,rolls:0,kills:0,bosses:0,gathered:0,waveBest:0,claimed:[],visited:[0],sigils:[],party:[createMon(id)],active:0,island:0,gear:0,days:[],playtime:0,transactions:[]});
 }
+export function enemyRole(p){return p.id%7===0?'healer':p.id%4===0?'ranger':p.s[5]>=90?'skirmisher':'brawler';}
 export function stats(mon,gear=0,bonus={}){
  const p=BY_ID.get(mon.id),s=mon.skills,t=TRAITS[mon.trait],l=mon.lv,iv=mon.iv;
  return {
