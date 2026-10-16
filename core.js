@@ -1,5 +1,6 @@
-import {migrateItems,validateItems} from './items.js?v=1.3.0';
-import { DEX, TYPES, EVOLUTION } from './data.js?v=1.3.0';
+import {validateAdventure} from './talents.js?v=1.4.0';
+import {migrateItems,validateItems} from './items.js?v=1.4.0';
+import { DEX, TYPES, EVOLUTION } from './data.js?v=1.4.0';
 export { DEX };
 export const VERSION=1;
 export const BY_ID=new Map(DEX.map(p=>[p.id,p]));
@@ -8,11 +9,11 @@ export const ISLANDS=[
  {id:0,name:'Aether Haven',sub:'A little home between adventures',level:1,mobMin:0,mobMax:0,bossLevel:0,color:'#9ec791',ground:'#6c9f69',water:'#316f86',weather:'petals',types:[],mobs:[],boss:143,desc:'Bank, summon shrine, forge and a quiet place to recover.'},
  {id:1,name:'Verdant Wilds',sub:'Follow the fireflies',level:1,mobMin:1,mobMax:5,bossLevel:8,color:'#a4d892',ground:'#568257',water:'#326d79',weather:'petals',types:['grass','bug','normal'],mobs:[10,13,16,19,43,46,69,163,263,415],boss:3,desc:'Soft grass, old ruins and a restless forest guardian.'},
  {id:2,name:'Coral Coast',sub:'Where the tide keeps secrets',level:8,mobMin:8,mobMax:12,bossLevel:16,color:'#9ddbd5',ground:'#b5ae7c',water:'#287f99',weather:'rain',types:['water','flying'],mobs:[54,60,72,90,98,116,120,183,278,341],boss:130,desc:'Rain empowers Water skills. Dodge the tidekeeper’s waves.'},
- {id:3,name:'Cinder Crater',sub:'Some things refuse to cool',level:16,mobMin:16,mobMax:21,bossLevel:26,color:'#f2b285',ground:'#715a53',water:'#a83d37',weather:'embers',types:['fire','rock','ground'],mobs:[37,58,74,77,95,104,218,322,524,662],boss:6,desc:'Volcanic stones, molten rivers and an airborne guardian.'},
- {id:4,name:'Frostveil Reach',sub:'Listen to the falling snow',level:25,mobMin:25,mobMax:30,bossLevel:36,color:'#c8e5f0',ground:'#a0bec3',water:'#426f95',weather:'snow',types:['ice','steel'],mobs:[86,87,220,225,361,363,436,582,613,712],boss:131,desc:'Snow slows wild Pokémon. Shelter among frost crystals.'},
- {id:5,name:'Stormglass Peaks',sub:'Walk above the thunder',level:35,mobMin:35,mobMax:40,bossLevel:47,color:'#d8d69a',ground:'#788071',water:'#3c5675',weather:'rain',types:['electric','flying','dragon'],mobs:[25,81,100,125,147,179,333,403,587,848],boss:149,desc:'Electric attacks resonate in the storm. Mind the charged floor.'},
- {id:6,name:'Moonshade Hollow',sub:'The forest remembers you',level:46,mobMin:46,mobMax:51,bossLevel:59,color:'#c4abe2',ground:'#55516d',water:'#353b66',weather:'wisps',types:['ghost','dark','psychic'],mobs:[92,93,200,215,228,280,353,425,607,778],boss:94,desc:'Moonlit ruins. Dark and Ghost skills gain a night-time echo.'},
- {id:7,name:'Astral Sanctuary',sub:'The edge of the known sky',level:58,mobMin:58,mobMax:63,bossLevel:70,color:'#e6c1ea',ground:'#81769c',water:'#3d416f',weather:'stars',types:['dragon','fairy','psychic'],mobs:[35,63,148,176,281,371,443,704,856,885],boss:384,desc:'Endgame sanctuary. Its guardian guards the final sigil.'}
+ {id:3,name:'Cinder Citadel',sub:'Some things refuse to cool',level:16,mobMin:16,mobMax:21,bossLevel:26,color:'#f2b285',ground:'#715a53',water:'#a83d37',weather:'embers',types:['fire','rock','ground'],mobs:[37,58,74,77,95,104,218,322,524,662],boss:6,desc:'Volcanic stones, molten rivers and an airborne guardian.'},
+ {id:4,name:'Frostveil Keep',sub:'Listen to the falling snow',level:25,mobMin:25,mobMax:30,bossLevel:36,color:'#c8e5f0',ground:'#a0bec3',water:'#426f95',weather:'snow',types:['ice','steel'],mobs:[86,87,220,225,361,363,436,582,613,712],boss:131,desc:'Snow slows wild Pokémon. Shelter among frost crystals.'},
+ {id:5,name:'Stormglass Foundry',sub:'Walk above the thunder',level:35,mobMin:35,mobMax:40,bossLevel:47,color:'#d8d69a',ground:'#788071',water:'#3c5675',weather:'rain',types:['electric','flying','dragon'],mobs:[25,81,100,125,147,179,333,403,587,848],boss:149,desc:'Electric attacks resonate in the storm. Mind the charged floor.'},
+ {id:6,name:'Moonshade City',sub:'The forest remembers you',level:46,mobMin:46,mobMax:51,bossLevel:59,color:'#c4abe2',ground:'#55516d',water:'#353b66',weather:'wisps',types:['ghost','dark','psychic'],mobs:[92,93,200,215,228,280,353,425,607,778],boss:94,desc:'Moonlit ruins. Dark and Ghost skills gain a night-time echo.'},
+ {id:7,name:'Astral Palace',sub:'The edge of the known sky',level:58,mobMin:58,mobMax:63,bossLevel:70,color:'#e6c1ea',ground:'#81769c',water:'#3d416f',weather:'stars',types:['dragon','fairy','psychic'],mobs:[35,63,148,176,281,371,443,704,856,885],boss:384,desc:'Endgame sanctuary. Its guardian guards the final sigil.'}
 ];
 export const RARITIES=['Common','Uncommon','Rare','Epic','Legendary'];
 export const RARITY_COLORS=['#aab9ae','#83c5a0','#82b9ee','#c699f0','#f5ce79'];
@@ -35,7 +36,7 @@ export const SKILLS=[
  {key:'strength',name:'Strength',icon:'⚔',desc:'+3 physical attack per point'},
  {key:'arcana',name:'Arcana',icon:'✦',desc:'+3 special attack, +4 Mana per point'},
  {key:'guard',name:'Guard',icon:'⬡',desc:'+3 defence and special defence per point'},
- {key:'haste',name:'Haste',icon:'➶',desc:'+2% movement; +0.5% critical chance per point'}
+ {key:'haste',name:'Haste',icon:'➶',desc:'+3 movement speed; +0.5% critical chance per point'}
 ];
 export const pretty=n=>n.split('-').map(x=>x[0].toUpperCase()+x.slice(1)).join(' ');
 export const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -59,6 +60,7 @@ export function stats(mon,gear=0,bonus={}){
  sd:(bonus.sd||0)+Math.floor((8+p.s[4]*.3+l+iv[4]*.3+s.guard*3+gear*2)*t.def),
  speed:Math.min(300,(bonus.speed||0)+(135+p.s[5]*.35+s.haste*3)*t.spd),
  mana:60+l*2+s.arcana*4+(bonus.mana||0),
+ regen:bonus.regen||0,cdr:Math.min(.25,bonus.cdr||0),mitigation:Math.min(.2,bonus.mitigation||0),loot:Math.min(.1,bonus.loot||0),
  crit:Math.min(.6,(bonus.crit||0)+.06+iv[5]/600+s.haste*.005)
  };
 }
@@ -118,7 +120,7 @@ export function daily(s,date=new Date().toISOString().slice(0,10)){if(s.days.inc
 export function validateSave(raw){
  if(!raw||raw.version!==VERSION||!Array.isArray(raw.party)||!raw.party.length||raw.party.length>300)throw Error('This save is not compatible.');
  const s=structuredClone(raw);
- validateItems(s);
+ validateItems(s);validateAdventure(s);
  for(const key of ['islandKills','islandGather','islandBosses']){s[key]??=Array(8).fill(0);if(!Array.isArray(s[key])||s[key].length!==8||s[key].some(n=>!Number.isSafeInteger(n)||n<0||n>1e9))throw Error('Invalid island progress.');}
  s.contracts??=[];s.contractClaims??=0;s.discovered??=[];s.treasures??=[];
  if(!Array.isArray(s.contracts)||s.contracts.length>3||s.contracts.some(c=>!/^([1-7])-(hunt|gather|boss)$/.test(c.id)||!Number.isSafeInteger(c.baseline)||c.baseline<0)||!Number.isSafeInteger(s.contractClaims)||s.contractClaims<0||!Array.isArray(s.discovered)||!Array.isArray(s.treasures)||s.discovered.length>21||s.treasures.length>21)throw Error('Invalid expedition records.');

@@ -1,3 +1,5 @@
+import {paintArchitecture} from './architecture.js?v=1.4.0';
+export const WORLD_SIZE={w:3600,h:2600};
 // Original pixel artwork. Coordinates in the painters are native pixels (2 world units).
 export const BIOMES=[
  {name:'Haven',ground:['#558a50','#629a57','#72a75f','#467446'],soil:'#bfa477',stone:'#86928a',water:['#285974','#316f88','#3e8a9c'],shore:'#d6c38d',leaf:['#214f3c','#326c48','#49884e','#70a452'],wall:['#c7b287','#e1cca0','#a38c69'],roof:['#783e3b','#a14f45','#c26c53'],trim:'#554838',light:'#ffe8a1',style:'timber',prop:'tree'},
@@ -17,15 +19,17 @@ export const TOWN_BUILDINGS=[
  {x:1830,y:650,w:184,h:90,label:'PROVISIONER',action:'market',variant:'market'},
  {x:1930,y:1070,w:202,h:112,label:'RANGERS GUILD',action:'contracts',variant:'guild'},
  {x:1200,y:1310,w:180,h:106,label:'THE ARCHIVIST',action:'bestiary',variant:'archive'},
- {x:600,y:1320,w:176,h:100,label:'EXPLORER’S LODGE',action:'guide',variant:'lodge'}
+ {x:600,y:1320,w:176,h:100,label:'EXPLORER’S LODGE',action:'guide',variant:'lodge'},
+ {x:2650,y:1360,w:320,h:170,label:'HAVEN KEEP',action:'talk',npcId:'keeper',variant:'fortress'}
 ];
 export function regionalBuildings(id){const b=BIOMES[id];return [
  {x:1660,y:800,w:176,h:94,label:b.name.toUpperCase()+' RANGERS',action:'contracts',variant:'guild'},
  {x:1240,y:600,w:150,h:88,label:b.name.toUpperCase()+' PROVISIONS',action:'camp',variant:'market'},
- {x:1290,y:1130,w:164,h:102,label:b.name.toUpperCase()+' FIELD STATION',action:'bestiary',variant:'archive'}
+ {x:1290,y:1130,w:164,h:102,label:b.name.toUpperCase()+' FIELD STATION',action:'bestiary',variant:'archive'},
+ {x:2650,y:1360,w:280,h:160,label:b.name.toUpperCase()+' GRAND HALL',action:'talk',npcId:'region-'+id,variant:id===3||id===4?'fortress':id===5?'tower':id===7?'temple':'guild'}
  ];}
-export function onIsland(id,x,y){const nx=(x-1500)/1380,ny=(y-1100)/970;return nx*nx+ny*ny<1+.055*Math.sin(x*.008+id*1.7)+.045*Math.cos(y*.012-id*.8);}
-const routes=[[480,790,1200,790],[900,390,900,1080],[1200,790,1660,800],[1660,800,1980,780],[1980,780,2200,1080],[900,1080,1200,1310],[1200,1310,1660,1510],[1660,1510,1900,1570],[1290,1130,1660,800],[1290,1130,1200,1310]];
+export function onIsland(id,x,y){const nx=(x-1800)/1650,ny=(y-1300)/1140;if(id===3||id===6)return Math.abs(nx)<.96&&Math.abs(ny)<.96&&Math.abs(nx)+Math.abs(ny)<1.77;return nx*nx+ny*ny<1+.055*Math.sin(x*.008+id*1.7)+.045*Math.cos(y*.012-id*.8);}
+const routes=[[2200,1080,2650,1360],[2650,1360,3000,1800],[1900,1570,2500,1860],[2500,1860,3000,1800],[480,790,1200,790],[900,390,900,1080],[1200,790,1660,800],[1660,800,1980,780],[1980,780,2200,1080],[900,1080,1200,1310],[1200,1310,1660,1510],[1660,1510,1900,1570],[1290,1130,1660,800],[1290,1130,1200,1310]];
 const segmentDist=(x,y,a)=>{const dx=a[2]-a[0],dy=a[3]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy);};
 export function roadAt(id,x,y){if(routes.some(a=>segmentDist(x,y,a)<30))return true;const houses=id?regionalBuildings(id):TOWN_BUILDINGS;return houses.some(b=>Math.abs(x-b.x)<24&&y>=b.y-4&&y<=Math.max(b.y+100,790))||(!id&&((Math.abs(y-790)<26&&x>580&&x<2000)||(Math.abs(x-1500)<26&&y>600&&y<1040)||(Math.abs(x-1930)<25&&y>780&&y<1095)||(Math.abs(y-1320)<24&&x>580&&x<1220)));}
 function poolAt(id,x,y){
@@ -38,7 +42,7 @@ function poolAt(id,x,y){
  if(id===6)return Math.hypot((x-650)/195,(y-1280)/140)<1;
  return Math.hypot((x-1830)/210,(y-470)/100)<1;
 }
-export function groundAt(id,x,y){if(!onIsland(id,x,y))return 'water';const pool=poolAt(id,x,y),road=roadAt(id,x,y);if(pool)return road?'bridge':id===4?'ice':id===3?'lava':'water';if(road)return 'road';if(!onIsland(id,x-38,y)||!onIsland(id,x+38,y)||!onIsland(id,x,y-38)||!onIsland(id,x,y+38))return 'shore';return 'ground';}
+export function groundAt(id,x,y){if(!onIsland(id,x,y))return 'water';const pool=poolAt(id,x,y),road=roadAt(id,x,y);if(pool)return road?'bridge':id===4?'ice':id===3?'lava':'water';if(road)return id===1?'dirt':id===2?'boardwalk':'road';if(!onIsland(id,x-38,y)||!onIsland(id,x+38,y)||!onIsland(id,x,y-38)||!onIsland(id,x,y+38))return 'shore';return id===3||id===6?'cobble':'ground';}
 export function walkableGround(id,x,y){return onIsland(id,x,y)&&!['water','lava'].includes(groundAt(id,x,y));}
 const R=(c,color,x,y,w,h)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));};
 const hash=(x,y,s=0)=>{let n=Math.imul(x+937,374761393)^Math.imul(y+729,668265263)^Math.imul(s+1,1274126177);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;};
@@ -49,7 +53,9 @@ export function paintTile(c,id,kind,x,y,variant=0){
  R(c,b.water[1],x,y+3,16,2);R(c,b.water[2],x+2+(variant%3),y+3,6,1);R(c,b.water[1],x+1,y+11,11,2);R(c,b.water[2],x+2,y+11,4,1);
  if(kind==='lava'){R(c,'#ffca6c',x+5,y+4,4,1);R(c,'#e99448',x+10,y+12,3,2);}return;
  }
- if(kind==='bridge'){R(c,'#584b43',x,y,16,16);for(let i=0;i<4;i++){R(c,i%2?'#a48c65':'#b79a6e',x,y+i*4,16,3);R(c,'#d1b27e',x+2,y+i*4,8,1);R(c,'#665744',x+1,y+i*4+1,1,1);R(c,'#665744',x+14,y+i*4+1,1,1);}return;}
+ if(kind==='cobble'){R(c,b.stone,x,y,16,16);for(let j=0;j<4;j++)for(let i=0;i<3;i++){R(c,j%2?b.wall[2]:b.wall[0],x+i*6-(j%2)*2,y+j*4,5,3);}return;}
+ if(kind==='dirt'){R(c,b.soil,x,y,16,16);for(let i=0;i<10;i++)R(c,i%2?'#8f7954':'#c3a976',x+Math.floor(hash(i,variant)*15),y+Math.floor(hash(variant,i)*15),2,1);return;}
+ if(kind==='bridge'||kind==='boardwalk'){R(c,'#584b43',x,y,16,16);for(let i=0;i<4;i++){R(c,i%2?'#a48c65':'#b79a6e',x,y+i*4,16,3);R(c,'#d1b27e',x+2,y+i*4,8,1);R(c,'#665744',x+1,y+i*4+1,1,1);R(c,'#665744',x+14,y+i*4+1,1,1);}return;}
  if(kind==='road'){
  for(let j=0;j<4;j++)for(let i=0;i<3;i++){const ox=(j%2)*3+i*6-3,oy=j*4;R(c,['#b7ab8b','#c6b99a','#d1c3a0','#a89d83'][(i+j+variant)%4],x+Math.max(0,ox),y+oy,Math.min(5,16-Math.max(0,ox)),3);if(i%2)R(c,'#d9cda9',x+Math.max(0,ox),y+oy,3,1);}return;
  }
@@ -59,7 +65,7 @@ export function paintTile(c,id,kind,x,y,variant=0){
  if(variant%4===0){R(c,g[3],x+4,y+8,1,4);R(c,g[2],x+3,y+6,1,3);R(c,g[2],x+6,y+7,1,3);R(c,g[1],x+5,y+9,1,3);}
  if(variant===6){const flower=id===3?'#dd9a6c':id===4?'#edf7ed':id>5?'#c1acd7':'#efcf91';R(c,g[3],x+10,y+11,1,3);R(c,flower,x+9,y+9,3,2);R(c,'#f6e0a5',x+10,y+10,1,1);}
 }
-export function paintTerrain(c,id,w=3000,h=2200){
+export function paintTerrain(c,id,w=WORLD_SIZE.w,h=WORLD_SIZE.h){
  // Work at half-world resolution; all source pixels are integer aligned.
  for(let y=0;y<h/2;y+=16)for(let x=0;x<w/2;x+=16){const kind=groundAt(id,x*2+16,y*2+16);paintTile(c,id,kind,x,y,Math.floor(hash(x,y,id)*8));if(kind==='ground'&&!roadAt(id,x*2+16,y*2+16)){
  if(id===0&&x>330&&x<430&&y>505&&y<570){R(c,'#5c573a',x,y,16,16);for(let j=1;j<16;j+=4){R(c,'#b59a63',x,y+j,16,1);for(let i=2;i<16;i+=4){R(c,'#3c693c',x+i,y+j-2,2,3);R(c,'#8bb451',x+i,y+j-3,2,1);}}}
@@ -91,6 +97,7 @@ export function paintRock(c,id,kind='rock',variant=0){const b=BIOMES[id];R(c,'#1
  else{R(c,b.trim,-14,-14,28,15);R(c,b.stone,-17,-10,34,10);R(c,b.wall[0],-10,-20,21,12);R(c,b.wall[1],-7,-20,14,3);R(c,b.wall[2],7,-16,5,12);R(c,b.trim,-3,-9,5,1);if(id===3){R(c,'#d47a50',-6,-8,3,2);R(c,'#eeab64',5,-15,2,2);}}
 }
 export function paintBuilding(c,id,o,time=0){
+ if(paintArchitecture(c,id,o,BIOMES[id]))return;
  const b=BIOMES[id],w=(o.w||176)/2,h=(o.h||94)/2,left=-w/2,top=-h;
  const variant=o.variant||'lodge',style=variant==='forge'?'forge':b.style,roof=variant==='relic'?['#593950','#80506f','#ac7890']:variant==='bank'?['#8e5941','#ba7953','#db9e65']:b.roof;
  R(c,'#132b364a',left+6,-8,w+9,17);R(c,b.trim,left-3,top-2,w+6,h+8);R(c,b.wall[0],left,top,w,h);R(c,b.wall[1],left+2,top+2,w-5,h-8);
@@ -141,6 +148,8 @@ export function paintProp(c,id,o,time=0,ox=0,oy=0){const b=BIOMES[id],kind=o.kin
  else if(kind==='flowers'){R(c,'#67543d',-13,-4,26,6);R(c,'#9f8252',-13,-4,26,2);for(let i=0;i<5;i++){R(c,b.leaf[1],-10+i*5,-8,2,5);R(c,i%2?'#e7b4b8':'#edcf80',-11+i*5,-10-i%2,4,3);}}
  else if(kind==='lamp'||kind==='lantern'){R(c,b.trim,-1,-30,3,32);R(c,'#a88b59',-5,-35,11,4);R(c,'#554a3c',-6,-32,13,11);R(c,b.light,-4,-31,9,8);R(c,'#a88b59',-1,-31,2,8);R(c,b.trim,-7,-35,15,2);}
  else if(kind==='well'){R(c,b.trim,-13,-7,26,13);R(c,b.stone,-14,-7,28,8);R(c,b.wall[1],-14,-8,28,3);R(c,b.water[0],-10,-6,20,3);R(c,b.trim,-12,-29,3,24);R(c,b.trim,9,-29,3,24);for(let i=0;i<6;i++)R(c,b.roof[i%3],-16+i*2,-38+i*2,32-i*4,2);R(c,'#c6ae7c',0,-29,1,24);}
+ else if(kind==='table'){R(c,b.trim,-16,-8,4,14);R(c,b.trim,13,-8,4,14);R(c,'#9f8059',-20,-17,40,15);R(c,'#c3a273',-19,-17,38,3);R(c,'#69583f',-18,-9,36,2);R(c,'#c7b591',-5,-15,10,5);R(c,'#867c69',5,-16,3,5);}
+ else if(kind==='chair'){R(c,b.trim,-8,-16,3,21);R(c,b.trim,6,-16,3,21);R(c,'#b39367',-8,-17,17,4);R(c,'#b39367',-9,-5,19,4);}
  else if(kind==='fence'){R(c,b.trim,-13,-17,3,19);R(c,b.trim,10,-17,3,19);R(c,'#b4a279',-15,-14,30,3);R(c,'#b4a279',-15,-6,30,3);R(c,'#dbc79c',-14,-14,28,1);}
  else if(kind==='board'){R(c,b.trim,-10,-24,3,26);R(c,b.trim,8,-24,3,26);R(c,'#8f7953',-14,-26,30,19);R(c,'#d7c99e',-11,-23,11,12);R(c,'#e8d9ad',3,-23,10,10);R(c,'#917a55',-9,-20,7,1);R(c,'#917a55',4,-17,7,1);}
  else if(kind==='boat'){R(c,b.trim,-25,-6,50,10);R(c,'#ad8b60',-22,-7,44,7);R(c,'#d6b681',-17,-5,34,2);R(c,b.trim,-1,-37,2,32);for(let i=0;i<11;i++)R(c,i%3?'#e5d8b2':'#bfc3af',1,-36+i*2,Math.max(2,20-i*2),2);}

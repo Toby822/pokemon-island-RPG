@@ -1,8 +1,9 @@
-import {WorldHub} from './world-hub.js?v=1.3.0';
-import {itemBonuses} from './items.js?v=1.3.0';
-import {awardXP} from './core.js?v=1.3.0';
-import {BY_ID,stats,clamp} from './core.js?v=1.3.0';
-const PREFIX='tides-aether-v3-';
+import {WORLD_SIZE} from './pixel-art.js?v=1.4.0';
+import {WorldHub} from './world-hub.js?v=1.4.0';
+import {itemBonuses} from './items.js?v=1.4.0';
+import {awardXP} from './core.js?v=1.4.0';
+import {BY_ID,stats,clamp} from './core.js?v=1.4.0';
+const PREFIX='tides-aether-v4-';
 export class Coop{
  constructor(world,changed,toast){this.w=world;this.changed=changed;this.toast=toast;this.role='solo';this.peer=null;this.connections=new Map();this.host=null;this.code='';this.status='Solo adventure';this.elapsed=0;this.timeout=null;this.name='Explorer';this.maxPlayers=4;this.realm=null;this.hub=null;this.populations=Array(8).fill(0);world.net=this;}
  async boot(fixedCode=null){
@@ -43,7 +44,7 @@ export class Coop{
  conn.on('close',()=>{this.connections.delete(conn.peer);delete this.w.remotes[conn.peer];this.hub?.remove(conn.peer);if(this.role==='guest'){this.leave(false);this.status='Host left. Returned to solo Haven.';this.w.changeIsland(0);this.w.recover();this.toast(this.status);}else{this.status='Room open · '+(this.connections.size+1)+'/'+this.maxPlayers+' explorers';}this.changed();});
  conn.on('error',()=>{this.toast('A co-op connection failed. Solo play is still available.','bad');});
  }
- self(){const w=this.w,m=w.mon();return {x:w.p.x,y:w.p.y,face:w.p.face,dir:w.p.dir,walking:w.p.walking,action:w.p.action,actionUntil:Math.max(0,w.p.actionUntil-w.time),actionElapsed:Math.max(0,w.time-(w.p.actionStart||0)),hp:w.p.hp,mp:w.p.mp,island:w.id,name:this.name,mon:{id:m.id,lv:m.lv,iv:m.iv,trait:m.trait,skills:m.skills,rank:m.rank,shiny:m.shiny},gear:w.s.gear,bonuses:itemBonuses(w.s),trainer:w.s.trainer};}
+ self(){const w=this.w,m=w.mon();return {x:w.p.x,y:w.p.y,face:w.p.face,dir:w.p.dir,walking:w.p.walking,action:w.p.action,actionUntil:Math.max(0,w.p.actionUntil-w.time),actionElapsed:Math.max(0,w.time-(w.p.actionStart||0)),hp:w.p.hp,mp:w.p.mp,dying:!!w.p.dying,deathElapsed:w.p.dying?w.time-w.p.deathStart:0,island:w.id,name:this.name,mon:{id:m.id,lv:m.lv,iv:m.iv,trait:m.trait,skills:m.skills,rank:m.rank,shiny:m.shiny},gear:w.s.gear,bonuses:itemBonuses(w.s),trainer:w.s.trainer};}
  receive(conn,msg){
  if(!msg||typeof msg.type!=='string')return;
  if(msg.type==='full'){this.leave(false);this.status='This world is full. Choose another world.';this.changed();return;}
@@ -56,14 +57,18 @@ export class Coop{
  if(conn!==this.host)return;this.handleHostMessage(msg);
  }
  handleHostMessage(msg){
+ if(msg.type==='bossVictory'&&msg.island===this.w.id&&BY_ID.has(msg.id)){this.w.victoryIntro?.(msg.id);return;}
+ if((msg.type==='bossIntro'||msg.type==='bossPhase')&&msg.island===this.w.id&&BY_ID.has(msg.id)){this.w.beginIntro?.(msg.id,msg.type==='bossPhase');return;}
+ if(msg.type==='enemyDown'&&msg.island===this.w.id&&BY_ID.has(msg.enemy?.id)&&Number.isFinite(msg.enemy.x)&&Number.isFinite(msg.enemy.y)){this.w.corpses??=[];this.w.corpses.push({...msg.enemy,dying:true,action:'Faint',actionStart:this.w.time,actionUntil:this.w.time+1.6,deathStart:this.w.time,deathElapsed:0,life:1.6});return;}
  if(msg.type==='welcome'){this.toast('Connected. Every explorer can choose their own island.','good');this.changed();return;}
  if(msg.type==='snapshot'){
  if(msg.island!==this.w.id||!Array.isArray(msg.enemies)||msg.enemies.length>50)return;
  this.w.mode=msg.mode==='rift'?'rift':'explore';this.w.wave=clamp(msg.wave||0,0,10000);
- this.w.enemies=msg.enemies.filter(e=>BY_ID.has(e.id)&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&Number.isFinite(e.hp)&&Number.isFinite(e.max)&&e.max>0).map(e=>({...e,actionStart:this.w.time-((msg.clock||0)-(e.actionStart||0)),actionUntil:this.w.time+((e.actionUntil||0)-(msg.clock||0)),x:clamp(e.x,0,3000),y:clamp(e.y,0,2200)}));
+ this.w.enemies=msg.enemies.filter(e=>BY_ID.has(e.id)&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&Number.isFinite(e.hp)&&Number.isFinite(e.max)&&e.max>0).map(e=>({...e,actionStart:this.w.time-((msg.clock||0)-(e.actionStart||0)),actionUntil:this.w.time+((e.actionUntil||0)-(msg.clock||0)),x:clamp(e.x,0,WORLD_SIZE.w),y:clamp(e.y,0,WORLD_SIZE.h)}));
+ this.w.hazards=Array.isArray(msg.hazards)?msg.hazards.slice(0,80).filter(h=>['circle','line','ring'].includes(h.kind)&&Number.isFinite(h.x)&&Number.isFinite(h.y)&&Number.isFinite(h.age)&&Number.isFinite(h.delay)).map(h=>({...h})):[];this.w.riftTime=Number.isFinite(msg.riftTime)?msg.riftTime:0;
  this.w.bullets=Array.isArray(msg.bullets)?msg.bullets.slice(0,200).filter(b=>Number.isFinite(b.x)&&Number.isFinite(b.y)):[];
  if(Array.isArray(msg.nodes))msg.nodes.forEach((ready,i)=>{if(this.w.nodes[i]&&Number.isFinite(ready))this.w.nodes[i].ready=clamp(ready,0,55);});
- this.w.remotes={};for(const [id,a] of Object.entries(msg.players||{})){if(id===this.peer?.id||!validPlayer(a))continue;this.w.remotes[id]={...a,actionStart:this.w.time-Math.min(1,a.actionElapsed||0),actionUntil:this.w.time+Math.min(.6,a.actionUntil||0),st:stats(a.mon,a.gear||0,a.bonuses||{}),name:cleanName(a.name)};}
+ this.w.remotes={};for(const [id,a] of Object.entries(msg.players||{})){if(id===this.peer?.id||!validPlayer(a))continue;this.w.remotes[id]={...a,actionStart:this.w.time-Math.min(1,a.actionElapsed||0),actionUntil:this.w.time+Math.min(.6,a.actionUntil||0),st:stats(a.mon,a.gear||0,a.bonuses||{}),deathStart:this.w.time-Math.min(2,a.deathElapsed||0),name:cleanName(a.name)};}
  if(Array.isArray(msg.populations)&&msg.populations.length===8)this.populations=msg.populations;return;
  }
  if(msg.type==='reward'&&Number.isFinite(msg.coins)&&msg.coins>=0&&msg.coins<100000&&Number.isFinite(msg.xp)&&msg.xp>=0&&msg.xp<100000&&[0,1,3].includes(msg.tickets)&&Number.isInteger(msg.island)&&msg.island>0&&msg.island<8)this.w.grant(msg);
@@ -89,4 +94,4 @@ export class Coop{
  }
 }
 function cleanName(s){return String(s||'Explorer').replace(/[<>&"'\x60]/g,'').slice(0,18)||'Explorer';}
-function validPlayer(s){return s&&Number.isFinite(s.x)&&Number.isFinite(s.y)&&Number.isFinite(s.hp)&&Number.isInteger(s.island)&&s.island>=0&&s.island<8&&BY_ID.has(s.mon?.id)&&Number.isInteger(s.mon.lv)&&s.mon.lv>=1&&s.mon.lv<=60&&Array.isArray(s.mon.iv)&&s.mon.iv.length===6&&s.mon.iv.every(x=>Number.isInteger(x)&&x>=0&&x<=31)&&Number.isInteger(s.mon.trait)&&s.mon.trait>=0&&s.mon.trait<5&&Number.isInteger(s.mon.rank)&&s.mon.rank>=0&&s.mon.rank<=5&&['vitality','strength','arcana','guard','haste'].every(k=>Number.isInteger(s.mon.skills?.[k])&&s.mon.skills[k]>=0&&s.mon.skills[k]<=40)&&(!s.bonuses||Object.entries(s.bonuses).every(([k,v])=>['hp','atk','def','sp','sd','speed','mana','crit','xp'].includes(k)&&Number.isFinite(v)&&v>=0&&v<=5000));}
+function validPlayer(s){return s&&Number.isFinite(s.x)&&Number.isFinite(s.y)&&Number.isFinite(s.hp)&&Number.isInteger(s.island)&&s.island>=0&&s.island<8&&BY_ID.has(s.mon?.id)&&Number.isInteger(s.mon.lv)&&s.mon.lv>=1&&s.mon.lv<=60&&Array.isArray(s.mon.iv)&&s.mon.iv.length===6&&s.mon.iv.every(x=>Number.isInteger(x)&&x>=0&&x<=31)&&Number.isInteger(s.mon.trait)&&s.mon.trait>=0&&s.mon.trait<5&&Number.isInteger(s.mon.rank)&&s.mon.rank>=0&&s.mon.rank<=5&&['vitality','strength','arcana','guard','haste'].every(k=>Number.isInteger(s.mon.skills?.[k])&&s.mon.skills[k]>=0&&s.mon.skills[k]<=40)&&(!s.bonuses||Object.entries(s.bonuses).every(([k,v])=>['hp','atk','def','sp','sd','speed','mana','crit','xp','regen','cdr','mitigation','loot'].includes(k)&&Number.isFinite(v)&&v>=0&&v<=5000));}

@@ -1,4 +1,4 @@
-import {STARTER_ANIMS} from './pmd-meta.js?v=1.3.0';
+import {STARTER_ANIMS} from './pmd-meta.js?v=1.4.0';
 const SOURCE='https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/';
 // Native PMD rows: S, SE, E, NE, N, NW, W, SW.
 export function facing(dx,dy,last=0){return dx||dy?(Math.round(Math.atan2(dx,dy)/(Math.PI/4))+8)%8:last;}
@@ -24,19 +24,19 @@ export class SpriteBank{
  if(!response.ok)throw Error('No sprite sheet');
  const xml=new DOMParser().parseFromString(await response.text(),'text/xml'),all={};
  for(const node of xml.querySelectorAll('Anim')){const read=n=>node.querySelector(n)?.textContent;all[read('Name')]={name:read('Name'),w:+read('FrameWidth'),h:+read('FrameHeight'),copy:read('CopyOf'),d:[...node.querySelectorAll('Duration')].map(v=>+v.textContent)};}
- const meta={};for(const name of ['Walk','Idle','Attack','Shoot','Hurt']){let a=all[name]||all.Walk;if(a?.copy)a=all[a.copy];if(a?.w)meta[name]=a;}
+ const meta={};for(const name of ['Walk','Idle','Attack','Shoot','Hurt','Faint']){if(name==='Faint'&&!all.Faint)continue;let a=all[name]||all.Walk;if(a?.copy)a=all[a.copy];if(a?.w)meta[name]=a;}
  this.install(id,meta);
  }catch(e){this.entries.set(id,{meta:{},images:{}});this.failed++;}
  }
  draw(c,id,x,y,entity,time,scale=2,shiny=false,reduced=false){
  const entry=this.entries.get(id);if(!entry){this.request(id);return false;}
- const acting=entity?.actionUntil>time,action=acting?entity.action:entity?.hit>0?'Hurt':entity?.walking?'Walk':'Idle';
+ const acting=entity?.dying||entity?.actionUntil>time,action=entity?.dying?'Faint':acting?entity.action:entity?.hit>0?'Hurt':entity?.walking?'Walk':'Idle';
  let meta=entry.meta[action]||entry.meta.Idle||entry.meta.Walk;if(!meta)return false;
  let im=entry.images[meta.name];if(!im?.complete||!im.naturalWidth){meta=entry.meta.Walk;im=meta&&entry.images[meta.name];if(!im?.complete||!im.naturalWidth)return false;}
  const seconds=acting?time-(entity.actionStart||0):time+(entity?.uid||0)*.1;
  const frame=reduced&&action==='Idle'?0:animationFrame(meta.d,seconds,!acting),rows=Math.max(1,Math.floor(im.naturalHeight/meta.h)),dir=rows===1?0:(entity?.dir??0)%Math.min(8,rows);
  c.save();if(shiny)c.filter='hue-rotate(45deg) saturate(1.3)';
- if(entity?.hit>0)c.globalAlpha=.65+Math.sin(time*80)*.3;
+ if(entity?.hit>0&&!entity?.dying){c.globalAlpha*=.65+Math.sin(time*80)*.3;c.filter='brightness(1.7) saturate(.5)';}
  const width=meta.w*scale,height=meta.h*scale;
  c.drawImage(im,frame*meta.w,dir*meta.h,meta.w,meta.h,Math.round(x-width/2),Math.round(y-height/2-14),width,height);
  c.restore();return true;

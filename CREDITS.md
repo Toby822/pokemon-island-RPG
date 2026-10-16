@@ -53,3 +53,13 @@ The official Hypixel wiki’s [Weapons](https://wiki.hypixel.net/Weapons), [Drag
 - Square Enix, OCTOPATH TRAVELER HD-2D overview: https://www.jp.square-enix.com/octopathtraveler/about/ — visual reference for layered foreground/background treatment. This project remains Canvas 2D.
 - Game Accessibility Guidelines: https://gameaccessibilityguidelines.com/use-an-easily-readable-default-font-size/ and https://gameaccessibilityguidelines.com/provide-high-contrast-between-text-ui-and-background/ — readable default size and contrast guidance.
 - The biome tiles, structures, UI scene illustrations and coin/item SVGs in `pixel-art.js`, `art-scenes.js`, `ui-art.js` and `assets/scenes` / `assets/icons` are original artwork for this project, created in code. They are separate from the Pokémon sprites credited above.
+
+
+## Guardian Chronicles (v1.4) research and localisation
+
+- Official Traditional Chinese names for all 1,025 default species come from [PokéAPI pokemon_species_names.csv](https://github.com/PokeAPI/pokeapi/blob/master/data/v2/csv/pokemon_species_names.csv), language ID 4, retrieved 16 October 2026. English aliases use language ID 9. The interface translations and NPC dialogue are original project text.
+- [Hypixel Team — Crimson Isle update](https://hypixel.net/threads/skyblock-patch-0-13-crimson-isle.4914038/) and [Primordial Broodfather alpha testing](https://hypixel.net/threads/july-8-primordial-broodfather-alpha-testing.5947341/) informed region-specific rewards, accessory progression and differentiated boss encounters.
+- [Supergiant Games — Hades development updates](https://www.supergiantgames.com/blog/8/) informed passive build choices and readable combat patterns.
+- [Square Enix — OCTOPATH TRAVELER 0](https://www.square-enix.com/asia/newsportal/en/topics/octopathtraveler0/post01.html) informed layered pixel scenery and environmental depth. This project uses its own Canvas 2D geometry.
+- [JPTER78/PokéSurvivor](https://github.com/JPTER78/pokesurvivor) was reviewed for the requested pixel survivor presentation and animation approach. Its textures and gameplay code were not copied.
+- All new architecture in `architecture.js`, telegraph shapes, cinematic frames, equipment silhouettes and regional SVG illustrations are original code-drawn project artwork. Pokémon portraits retain the third-party attribution above. Talent rules, NPC dialogue, weapon profiles, banner odds and boss patterns are this project's original implementation.

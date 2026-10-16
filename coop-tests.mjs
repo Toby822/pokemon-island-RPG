@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {EventEmitter} from 'node:events';
-import {Coop} from './coop.js?v=1.3.0';
-import {newGame,stats} from './core.js?v=1.3.0';
+import {Coop} from './coop.js?v=1.4.0';
+import {newGame,stats} from './core.js?v=1.4.0';
 const registry=new Map();
 class Connection extends EventEmitter{
  constructor(peer){super();this.peer=peer;this.open=false;}
@@ -36,7 +36,18 @@ b.action('gather',0);assert(wb.s.herbs>0);a.action('gather',0);assert.equal(wa.s
 assert.equal(a.hub.clients.get(a.peer.id).island,1);
 wa.p.action='Attack';wa.p.actionStart=0;wa.p.actionUntil=.45;wa.time=.2;a.tick(.2);await flush();
 assert.equal(Object.values(wb.remotes)[0].action,'Attack');
+// New encounter packets stay within the player's current island and preserve warning time.
+const scene=a.hub.scene(1);scene.hazards=[{kind:'ring',x:1000,y:800,r:180,inner:75,age:.3,delay:1.45,life:.4}];scene.riftTime=1750;
+a.tick(.2);await flush();assert.equal(wb.hazards[0].inner,75);assert.equal(wb.hazards[0].age,.3);assert.equal(wb.riftTime,1750);
+let entrance=null;wb.beginIntro=(id,phase)=>{entrance={id,phase};};
+a.sendTo(b.peer.id,{type:'bossIntro',island:2,id:6});assert.equal(entrance,null);
+a.sendTo(b.peer.id,{type:'bossIntro',island:1,id:3});assert.deepEqual(entrance,{id:3,phase:false});
+a.sendTo(b.peer.id,{type:'bossPhase',island:1,id:3});assert.deepEqual(entrance,{id:3,phase:true});
+wb.time=20;a.sendTo(b.peer.id,{type:'enemyDown',island:1,enemy:{id:25,x:900,y:790},clock:100});
+assert.equal(wb.corpses[0].deathStart,20);assert.equal(wb.corpses[0].life,1.6);
+wa.p.dying=true;wa.p.hp=0;wa.p.deathStart=wa.time-.5;a.tick(.2);await flush();
+const fallen=Object.values(wb.remotes)[0];assert(fallen.dying);assert.equal(fallen.deathStart,wb.time-.5);
 a.leave(false);await flush();assert.equal(b.role,'solo');assert.equal(wb.id,0);
 assert.equal(registry.size,0);
-console.log('PASS shared-world host election, independent island travel, isolated combat, nearby regional rewards, shared resource cooldowns, animation sync and disconnect recovery using an in-memory signalling transport.');
+console.log('PASS shared-world election, island isolation, rewards, resources, boss warnings/entrances, falling-body clock sync and disconnect recovery using an in-memory signalling transport.');
 console.log('These protocol tests do not verify internet WebRTC, NAT traversal or the public PeerJS service.');

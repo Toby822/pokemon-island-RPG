@@ -1,6 +1,6 @@
 # Pokémon · Tides of Aether
 
-An unofficial, non-commercial 2D island action RPG about collecting companions and taking the long way home.
+An unofficial, non-commercial pixel action RPG about collecting companions and taking the long way home.
 
 **[Play in your browser](https://toby822.github.io/pokemon-island-RPG/)** · [Controls and rules](#playing) · [Credits](CREDITS.md)
 
@@ -8,7 +8,7 @@ No account, purchase, build step or API key is required. Use a current desktop b
 
 ## What you can play
 
-- **Eight islands:** a safe village plus seven combat biomes with their own enemies, guardian, colour palette and atmosphere.
+- **Eight 3600 × 2600 regions:** a safe town, forest, harbour, citadel, keep, industrial district, moonlit city and astral palace, with distinct architecture and guardians.
 - **1,025 collectible species:** bundled PokéAPI base stats, dual types, type effectiveness, Legendary/Mythical classifications and evolution relationships.
 - **Real-time action combat:** WASD movement, melee, aimed elemental projectiles, area damage, Mana regeneration, dodge invulnerability and telegraphed guardian attacks.
 - **Permanent progression:** trainer levels unlock islands; each companion has its own XP, six IVs, trait, shiny status, skill points and ascension rank.
@@ -17,7 +17,9 @@ No account, purchase, build step or API key is required. Use a current desktop b
 - **An economy with consequences:** carried coins, protected bank deposits, 50% carried-coin loss on defeat, resource gathering, potions and shared equipment refinement.
 - **Shared pixel worlds and co-op:** up to eight browsers share the host's world over WebRTC. Everyone retains their own collection and local save.
 - **Save export/import:** validated JSON backups for moving between devices.
-- Reduced-motion controls, keyboard-accessible menus, responsive layouts and optional synthesised sound effects.
+- **Build choices:** a 15-node passive talent tree, 26 equipment profiles, regional guardian weapon banners and a searchable backpack.
+- **Bilingual interface:** Traditional Chinese / English, including bundled official Traditional Chinese names for all 1,025 species.
+- Reduced-motion controls, larger-text preference, keyboard-accessible menus, responsive layouts and optional synthesised sound effects.
 
 ## Playing
 
@@ -43,11 +45,11 @@ Menus pause solo play. **Co-op continues while menus are open.** Move somewhere 
 | Aether Haven | 1 | Bank, shrine, forge, healing and journal |
 | Verdant Wilds | 1 | Grass/Bug/Normal enemies; Venusaur guardian |
 | Coral Coast | 8 | Water coast; Water skills gain 20% damage |
-| Cinder Crater | 16 | Fire/Rock/Ground enemies; Charizard guardian |
-| Frostveil Reach | 25 | Ice/Steel enemies; wild movement slowed by 15% |
-| Stormglass Peaks | 35 | Electric/Flying/Dragon enemies; Electric skills gain 20% damage |
-| Moonshade Hollow | 46 | Ghost/Dark/Psychic enemies; Ghost/Dark skills gain 20% damage |
-| Astral Sanctuary | 58 | Dragon/Fairy/Psychic enemies; Rayquaza guardian |
+| Cinder Citadel | 16 | Fire/Rock/Ground enemies; Charizard guardian |
+| Frostveil Keep | 25 | Ice/Steel enemies; wild movement slowed by 15% |
+| Stormglass Foundry | 35 | Electric/Flying/Dragon enemies; Electric skills gain 20% damage |
+| Moonshade City | 46 | Ghost/Dark/Psychic enemies; Ghost/Dark skills gain 20% damage |
+| Astral Palace | 58 | Dragon/Fairy/Psychic enemies; Rayquaza guardian |
 
 Combat islands have a guardian altar to the north and a Rift portal to the west. Travel ends the current encounter and restores HP/Mana. Earn all seven distinct guardian sigils to finish the final journal objective.
 
@@ -78,7 +80,7 @@ IV reforging costs 12 stardust and can make stats worse. Releasing a companion g
 
 ## Market district and expedition systems (v1.2)
 
-Every island now uses a 3000 × 2200 world, expanded from 1800 × 1400. The eastern roads lead to additional districts and three exploration landmarks per combat island. Each landmark awards XP once, and each nearby cache can be claimed once per profile for coins, stardust and an equipment voucher. Resources regrow during active simulation.
+Every region now uses a 3600 × 2600 world (v1.4), expanded from the 3000 × 2200 v1.2 map and original 1800 × 1400 map. The eastern roads lead to additional districts and three exploration landmarks per combat island. Each landmark awards XP once, and each nearby cache can be claimed once per profile for coins, stardust and an equipment voucher. Resources regrow during active simulation.
 
 | Haven service | Purpose |
 | --- | --- |
@@ -153,6 +155,12 @@ The automated tests cover the full species pool, type immunity, banking/death ac
 | progression.js | Regional rewards, repeatable contracts, discoveries and treasure |
 | expansion-ui.js | Equipment, emporium, market, contracts, bestiary and town menus |
 | world-hub.js | Independent island simulations and per-island reward routing |
+| talents.js / chronicle-ui.js | Passive talent paths and progression menus |
+| bosses.js / combat-view.js | Guardian patterns, warning geometry, HP frames and encounter cinematics |
+| boss-armory.js / relic-weapons.js | Regional weapon seals, exclusive profiles and banner pity |
+| dialogue.js | Pokémon NPCs, animated portraits and bilingual conversations |
+| i18n.js / names-zh.js / zh-catalog.js | Language preference, reversible DOM translation and species names |
+| architecture.js / chronicles.css | Original 2.5D pixel structures and navy/gold interface |
 | core.js | Combat formulas, economy, summons, quests, progression and save validation |
 | data.js | Local snapshot of default-species data and type effectiveness |
 | sprites.js / pmd-meta.js | Directional sprite sheets, frame timings and starter animation metadata |
@@ -191,14 +199,51 @@ Menus now use a readable default size, higher text contrast, larger buttons, ill
 | Aether Haven | 1 | Safe town | — | — |
 | Verdant Wilds | 1 | 1–5 | Venusaur | 8 |
 | Coral Coast | 8 | 8–12 | Gyarados | 16 |
-| Cinder Crater | 16 | 16–21 | Charizard | 26 |
-| Frostveil Reach | 25 | 25–30 | Lapras | 36 |
-| Stormglass Peaks | 35 | 35–40 | Dragonite | 47 |
-| Moonshade Hollow | 46 | 46–51 | Gengar | 59 |
-| Astral Sanctuary | 58 | 58–63 | Rayquaza | 70 |
+| Cinder Citadel | 16 | 16–21 | Charizard | 26 |
+| Frostveil Keep | 25 | 25–30 | Lapras | 36 |
+| Stormglass Foundry | 35 | 35–40 | Dragonite | 47 |
+| Moonshade City | 46 | 46–51 | Gengar | 59 |
+| Astral Palace | 58 | 58–63 | Rayquaza | 70 |
 
 Rift wild levels are the region’s minimum plus the wave number; Rift guardians use the guardian level plus the wave number. Trainer/companion levels still cap at 60. Higher regional unlocks apply to existing saves too; collections, equipment and currency are retained.
 
 Each combat island has a Rangers outpost, a regional provisioner selling potions, a field station, three exploration landmarks and three one-time caches. Enemy roles include close-combat brawlers, ranged attackers that hold their distance, faster skirmishers, and healers that restore 10% of nearby enemies’ maximum HP every seven seconds. Enemy/player projectiles collide with terrain obstacles. Shared worlds run these rules in the host’s island simulations. This update retains the browser-hosted multiplayer limits described above.
 
 Headless tests check reachable entrances, landmarks and caches on every island, valid arrival tiles, shared resource geometry, wild/guardian/Rift level ranges, ground collision, healing behaviour and movement directions. Local startup checks also exercise the menus and restart flow. Internet WebRTC and browser layout require separate live verification.
+
+
+## Guardian Chronicles (v1.4)
+
+### Places and presentation
+
+Buildings now have different silhouettes: treehouses with ladders, harbour lighthouses and decks, battlemented citadels, snowy lodges, coil towers, pagodas and columned temples. Nine Haven buildings include a keep; each combat region has four service structures. Dirt roads, boardwalks, cobbles, tables, chairs, stairs, offset shadows and projected side walls create depth within Canvas 2D. The interface uses navy, charcoal, violet and gold. This is layered 2D artwork, not a 3D engine.
+
+The upper-right language selector switches **繁體中文 / English** and saves the preference separately from adventure progress. Settings still offers **Larger text** and **Reduced motion**. The backpack has category filters, search, rarity/quality sorting, favourites and 18-item pages. The vendor catalogue scrolls horizontally; the Weapon Codex shows all 26 equipment profiles, stats, ownership and sources. The fourteen regional weapons change equipment stats; equipping one does not add a new attack animation or moveset.
+
+### Combat feedback and encounters
+
+Wild enemies show framed current/max HP numbers when injured or nearby. Hits trigger a red sprite flash, particles and floating damage numbers. All species, including the player, have a generic rotate-and-fade falling animation; a native PMD Faint sheet is used when available. This ensures a visible fallback when a species has no Faint sheet. Rescue follows the player's 1.6-second fall and removes half carried coins exactly once, preserving bank deposits.
+
+Each of the seven guardians has two named attack patterns selected from lines, fans, scattered circles, rings with safe centres and crosses. Arceus has three. Warnings last 1.45 seconds before damage. Three-second entrances, second-phase cut-ins below 50% HP and victory cards use letterboxing and portraits. The second phase accelerates attacks and expands patterns. Opening protection prevents damaging the guardian during its entrance. Regular populations can grow to 28–40 enemies per region. Encounter health scales for co-op; mitigation applies before a per-hit cap of 35% maximum player HP. These are automated balance bounds, not a substitute for playtesting every build.
+
+In **Astral Palace → Rift**, 30 active simulation minutes summon a level-75 Arceus encounter. This is an original timed endgame encounter; it does not claim to reproduce PokéSurvivor's full mechanics. The timer stops when solo play is paused and an unoccupied multiplayer region is not simulated. Travel or reopening the Rift starts a new run.
+
+### Talents, NPCs and rewards
+
+Open **Talents** for Wind, Stone and Arcana paths: fifteen nodes, three ranks each, with movement, cooldown, critical chance, HP, defence, regeneration, mitigation, Mana, damage, XP and loot passives. Gain one talent point every two trainer levels starting at level 3 (29 points at level 60). Later nodes require a trainer-level threshold and two ranks in their preceding node. Resetting costs 250 carried coins and refunds all spent talent points. Existing companion ability points remain separate.
+
+Thirteen Pokémon NPCs offer two-line bilingual dialogue, a typewriter reveal, an animated PMD portrait when available, advice and a relevant service link. Press **F** nearby. Each NPC gives one welcome gift per profile: 25 coins and a potion.
+
+Regular defeats have an 8% equipment-drop chance before talent bonuses. Guardians guarantee a normal equipment drop, an equipment voucher, three summon tickets and one seal for that region. A full equipment bag prevents the direct item drop; seals and vouchers are still retained. Open **Boss Armory** to spend one regional seal on one of that region's two exclusive weapon profiles. Seals cannot be spent on another region's banner.
+
+| Regional banner rarity | Base chance |
+| --- | ---: |
+| Rare | 60% |
+| Epic | 30% |
+| Mythic | 8% |
+| Legendary | 1.9% |
+| Ultra | 0.1% |
+
+Each regional banner has separate guarantees: Legendary+ by draw 20 and Ultra by draw 100. A qualifying result resets its corresponding counter. Item quality remains 80–120%, with independent 1/128 shiny odds. The original equipment banner retains its own 50/200 guarantees. All tickets and seals are earned through play.
+
+Old saves add empty talent/seal/NPC-gift records without resetting their collection or money. Multiplayer protocol v4 separates these larger maps from older clients and synchronises boss warnings, entrances, phase cut-ins and falling bodies. The same browser-hosted eight-player/four-player limits apply. Automated checks cover save migration, talent prerequisites and budgets, seal accounting/pity, reward-once behaviour, damage bounds, fallbacks and the in-memory multiplayer protocol. Internet WebRTC and the rendered browser layout require separate live verification.
